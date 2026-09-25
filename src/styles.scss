@@ -1,0 +1,14 @@
+// Bootstrap variable overrides go above the import below; Bootstrap only honors a variable that is
+// defined before its own default.
+$border-radius: 0.5rem;
+
+@import 'bootstrap/scss/bootstrap.scss';
+
+// TODO: the demo's own theming lands here once the Figma designs are in.
+body {
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}

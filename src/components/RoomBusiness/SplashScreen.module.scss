@@ -1,0 +1,54 @@
+.splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+}
+
+.content {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 50px;
+  min-height: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  // The whole content area is a <button> ("Touch Screen to Begin"), so strip the native focus
+  // ring in favor of a visible outline that still meets accessibility needs on a touch panel.
+  &:focus-visible {
+    outline: 3px solid #0d6efd;
+    outline-offset: -3px;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 700px;
+  max-width: 100%;
+  height: 549px;
+  max-height: 60vh;
+  padding: 10px;
+}
+
+.logoImage {
+  width: 100%;
+  height: auto;
+}
+
+.prompt {
+  font-weight: 300;
+  font-size: 36px;
+  line-height: 58px;
+  color: #000;
+  text-align: center;
+}

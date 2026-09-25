@@ -1,0 +1,88 @@
+$fill-color: #005294; // colors/primitive/blue-pdt
+$track-color: #e4e7e9;
+$knob-color: #2e3233;
+
+.fader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 140px;
+  height: 100%;
+}
+
+.label {
+  width: 150px;
+  padding: 8px 0 16px;
+  font-size: 16px;
+  line-height: 26px;
+  color: #000;
+  text-align: center;
+}
+
+.trackContainer {
+  display: flex;
+  align-items: center;
+  flex: 1 0 0;
+  min-height: 0;
+}
+
+// The draggable/tappable surface. Taller than the visible track so a touch near either end of the
+// fader still lands inside it - a 20px-wide hit target is unreasonably narrow on a touch panel.
+.touchset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+  height: 100%;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.track {
+  position: relative;
+  flex: 1 0 0;
+  min-height: 0;
+  width: 20px;
+  border-radius: 10px;
+  background-color: $track-color;
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: $fill-color;
+}
+
+.knob {
+  position: absolute;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: $knob-color;
+  transform: translate(-50%, 50%);
+  pointer-events: none;
+}
+
+.mutes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.muteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+}
+
+.muteIcon {
+  width: 36px;
+  height: 36px;
+}

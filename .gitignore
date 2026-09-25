@@ -141,3 +141,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Local dev config - copy _config.default.json to _config.local.json and point it at your processor
+public/_local-config/_config.local.json

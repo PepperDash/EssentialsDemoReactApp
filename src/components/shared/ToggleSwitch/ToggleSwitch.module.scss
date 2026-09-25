@@ -1,0 +1,66 @@
+$off-bg: #2e3233;
+$on-bg: #005294; // colors/semantic/button-active
+$knob-color: #fff;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.caption {
+  font-size: 16px;
+  line-height: 26px;
+  color: #000;
+  text-align: center;
+}
+
+.track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100px;
+  height: 40px;
+  padding: 10px;
+  border: none;
+  border-radius: 85px;
+  background-color: $off-bg;
+  cursor: pointer;
+
+  .label {
+    text-align: right;
+    padding-right: 8px;
+  }
+
+  &.on {
+    background-color: $on-bg;
+
+    .label {
+      text-align: left;
+      padding-left: 8px;
+    }
+
+    .knob {
+      transform: translateX(53.5px);
+    }
+  }
+}
+
+.label {
+  flex: 1;
+  font-size: 16px;
+  line-height: 26px;
+  color: #fff;
+}
+
+.knob {
+  position: absolute;
+  top: 5px;
+  left: 6.5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 85px;
+  background-color: $knob-color;
+  transition: transform 0.15s ease;
+}

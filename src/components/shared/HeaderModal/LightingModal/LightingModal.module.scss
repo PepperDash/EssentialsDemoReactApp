@@ -1,0 +1,39 @@
+.sceneList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 182px;
+  // This card's own padding (20px/40px): HeaderModalOverlay's shared card carries none, since it
+  // differs per modal.
+  padding: 20px 40px;
+}
+
+.title {
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 30px;
+  color: #000;
+}
+
+.sceneButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2e3233;
+  color: #fff;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 22px;
+  cursor: pointer;
+}
+
+.empty {
+  font-size: 16px;
+  color: #000;
+  text-align: center;
+}
