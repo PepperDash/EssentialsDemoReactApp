@@ -1,0 +1,26 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+
+.title {
+  width: 100%;
+  padding-bottom: 10px;
+  font-weight: 300;
+  font-size: 25px;
+  line-height: 38px;
+  color: #fff;
+  text-align: center;
+}
+
+.buttonList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}

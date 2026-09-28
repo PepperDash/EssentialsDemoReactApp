@@ -10,8 +10,11 @@ import RoomHome from './RoomHome';
 import HeaderModalOutlet from '../shared/HeaderModal/HeaderModalOutlet';
 import TechPinPage from '../TechControls/TechPin/TechPinPage';
 import TechLayout from '../TechControls/TechLayout/TechLayout';
-import TechPagePlaceholder from '../TechControls/TechLayout/TechPagePlaceholder';
 import SystemStatusPage from '../TechControls/SystemStatus/SystemStatusPage';
+import DisplaysPage from '../TechControls/Displays/DisplaysPage';
+import RoutingPage from '../TechControls/Routing/RoutingPage';
+import VolumePage from '../TechControls/Volume/VolumePage';
+import AboutPage from '../TechControls/About/AboutPage';
 import classes from './RoomBusiness.module.scss';
 
 /**
@@ -51,15 +54,14 @@ const RoomBusiness = () => {
           <Route path="/" element={isOn ? <RoomHome /> : <SplashScreen />} />
           <Route path="/techPin" element={<TechPinPage />} />
 
-          {/* System Status is the only tech section built so far; the rest are placeholders so
-              the nav's other links aren't dead ends while their Figma designs are still pending. */}
+          {/* All five tech sections are built. */}
           <Route path="/tech" element={<TechLayout />}>
             <Route index element={<Navigate replace to="systemStatus" />} />
             <Route path="systemStatus" element={<SystemStatusPage />} />
-            <Route path="displays" element={<TechPagePlaceholder label="Displays" />} />
-            <Route path="routing" element={<TechPagePlaceholder label="Routing" />} />
-            <Route path="volume" element={<TechPagePlaceholder label="Volume" />} />
-            <Route path="about" element={<TechPagePlaceholder label="About" />} />
+            <Route path="displays" element={<DisplaysPage />} />
+            <Route path="routing" element={<RoutingPage />} />
+            <Route path="volume" element={<VolumePage />} />
+            <Route path="about" element={<AboutPage />} />
           </Route>
 
           <Route path="*" element={<Navigate replace to="/" />} />

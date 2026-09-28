@@ -2,12 +2,26 @@ $fill-color: #005294; // colors/primitive/blue-pdt
 $track-color: #e4e7e9;
 $knob-color: #2e3233;
 
+// Dark-background variant (tech Volume page) - the light variant's track/knob contrast (light gray
+// track, dark knob) inverts against a dark page background, so `.dark` swaps both plus the label
+// and mute icon color; the fill color is the same blue in both.
+$dark-track-color: #2e3233;
+$dark-knob-color: #fff;
+
 .fader {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 140px;
   height: 100%;
+}
+
+// Marker class for the dark-background variant - applied alongside .fader on the same element.
+// Never styled directly; every other rule below reads it as an ancestor (`.dark &`) to recolor
+// itself. It needs a rule of its own (even an empty one) purely so CSS Modules exports a token for
+// it - referenced only inside compound ancestor selectors, it would otherwise never appear as a
+// class Vite's CSS Modules plugin recognizes as "used" and generates a scoped name for.
+.dark {
 }
 
 .label {
@@ -17,6 +31,10 @@ $knob-color: #2e3233;
   line-height: 26px;
   color: #000;
   text-align: center;
+
+  .dark & {
+    color: #fff;
+  }
 }
 
 .trackContainer {
@@ -46,6 +64,10 @@ $knob-color: #2e3233;
   border-radius: 10px;
   background-color: $track-color;
   overflow: hidden;
+
+  .dark & {
+    background-color: $dark-track-color;
+  }
 }
 
 .fill {
@@ -65,6 +87,10 @@ $knob-color: #2e3233;
   background-color: $knob-color;
   transform: translate(-50%, 50%);
   pointer-events: none;
+
+  .dark & {
+    background-color: $dark-knob-color;
+  }
 }
 
 .mutes {
@@ -80,6 +106,11 @@ $knob-color: #2e3233;
   justify-content: center;
   width: 55px;
   height: 55px;
+  color: #000;
+
+  .dark & {
+    color: #fff;
+  }
 }
 
 .muteIcon {

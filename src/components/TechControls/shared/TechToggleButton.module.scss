@@ -1,0 +1,22 @@
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 70px;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2e3233;
+  cursor: pointer;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 22px;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+
+  &.active {
+    background-color: #005294;
+  }
+}

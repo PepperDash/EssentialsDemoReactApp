@@ -19,6 +19,16 @@ import { RoomState } from '@pepperdash/mobile-control-react-app-core';
  * `/room/{key}/volumes/master/*` actions are wired automatically via `IHasCurrentVolumeControls`,
  * so the client never needs to know which device backs the room's volume control.
  */
+/** One entry in `DemoRoomState.techDisplays` - see `DemoRoomTechDisplayConfig` on the C# side. */
+export interface TechDisplayConfig {
+  /** Device key of the display itself - implements `IHasPowerControlWithFeedback` + `IHasInputs<string>`. */
+  deviceKey: string;
+  /** Device key of this display's projector screen (`IProjectorScreenLiftControl`), if it has one. */
+  screenDeviceKey?: string;
+  /** Device key of this display's projector lift (`IProjectorScreenLiftControl`), if it has one. */
+  liftDeviceKey?: string;
+}
+
 export interface DemoRoomState extends RoomState {
   /** Config `type` of the room device. Matches the type name in `DemoRoomFactory`. */
   roomType: 'essentialsDemoRoom';
@@ -34,4 +44,17 @@ export interface DemoRoomState extends RoomState {
    * posted by `DemoRoomMessenger` from `DemoRoomTechConfig.RackSensorDeviceKey`.
    */
   techRackSensorDeviceKey?: string;
+  /**
+   * Displays shown on the tech Displays page, in display order - posted by `DemoRoomMessenger` from
+   * `DemoRoomTechConfig.Displays`. There's no framework concept of "the displays in a room" beyond
+   * the routing destination list, so this is how the demo room tells the client which devices to
+   * offer and, for a display with a projector screen/lift, which companion devices back its extra
+   * controls.
+   */
+  techDisplays?: TechDisplayConfig[];
+  /**
+   * Device key of the matrix router shown on the tech Routing page - posted by `DemoRoomMessenger`
+   * from `DemoRoomTechConfig.RoutingDeviceKey`.
+   */
+  techRoutingDeviceKey?: string;
 }

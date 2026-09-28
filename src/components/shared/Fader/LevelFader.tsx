@@ -21,6 +21,9 @@ interface LevelFaderProps {
   label?: string;
   /** Picks the mute icon: a mic for mic-type level controls, a speaker for everything else. */
   isMic?: boolean;
+  /** Dark-background color variant, for the tech Volume page (dark tech-bg) as opposed to the
+   * audio controls modal's light background. */
+  dark?: boolean;
   volume: Volume;
 }
 
@@ -30,7 +33,7 @@ interface LevelFaderProps {
  * modal's individual channels (`DeviceLevelFader`) are the same control wired to different volume
  * sources, not two different faders.
  */
-export const LevelFader = ({ label, isMic, volume }: LevelFaderProps) => {
+export const LevelFader = ({ label, isMic, dark, volume }: LevelFaderProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
 
@@ -75,7 +78,7 @@ export const LevelFader = ({ label, isMic, volume }: LevelFaderProps) => {
   const MuteIcon = isMic ? MicMuteIcon : SpeakerMuteIcon;
 
   return (
-    <div className={classes.fader}>
+    <div className={`${classes.fader} ${dark ? classes.dark : ''}`}>
       {label && <span className={classes.label}>{label}</span>}
 
       <div className={classes.trackContainer}>
