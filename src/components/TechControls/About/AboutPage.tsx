@@ -17,9 +17,12 @@ const withoutBuildMetadata = (version: string) => {
  * own program file/database/environment info with its own reset button - real 4-series/virtual
  * control processors run one program slot per instance, so that model doesn't apply here. This
  * shows the one thing that's actually real for a single-slot Essentials install: the running
- * program's Essentials/PepperDash Core/plugin versions (`useRuntimeInfo`), plus this React app's
- * own build version (`APP_VERSION`) - content and logic ported from the reference `About.tsx` in
- * `kpmg-react-app`, restyled for this app's dark tech-page look instead of react-bootstrap.
+ * program's Essentials/plugin versions (`useRuntimeInfo`), plus this React app's own build version
+ * (`APP_VERSION`) - content and logic ported from the reference `About.tsx` in `kpmg-react-app`,
+ * restyled for this app's dark tech-page look instead of react-bootstrap.
+ *
+ * Not shown: PepperDash Core's version - it's built into Essentials itself, so it's always
+ * identical to `essentialsVersion` and would just be a redundant second line for the same number.
  *
  * Not shown: a touchpanel wrapper app version. Nothing in this library or app exposes one - there's
  * no native wrapper bridge to read it from here - so rather than fabricate a field, it's left out
@@ -61,7 +64,6 @@ export const AboutPage = () => {
       <div className={classes.programInfo}>
         <div className={classes.programText}>
           <p>Essentials: {runtimeInfo?.essentialsVersion}</p>
-          <p>PepperDash Core: {runtimeInfo?.pepperDashCoreVersion}</p>
           <p className={classes.pluginsHeading}>Plugins:</p>
           {sortedPlugins.map((plugin) => (
             <p key={plugin.name}>

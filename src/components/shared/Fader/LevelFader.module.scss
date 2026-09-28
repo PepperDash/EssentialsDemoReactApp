@@ -8,6 +8,8 @@ $knob-color: #2e3233;
 $dark-track-color: #2e3233;
 $dark-knob-color: #fff;
 
+$muted-color: #a9201e; // colors/semantic/button-danger
+
 .fader {
   display: flex;
   flex-direction: column;
@@ -46,7 +48,11 @@ $dark-knob-color: #fff;
 
 // The draggable/tappable surface. Taller than the visible track so a touch near either end of the
 // fader still lands inside it - a 20px-wide hit target is unreasonably narrow on a touch panel.
+// Positioned so `.knob` (an absolutely-positioned sibling of `.track`, not a child - see .knob) has
+// something to anchor to; centers on the same axis .track does via align-items:center, so .knob's
+// left:50% lines up with .track's actual center too.
 .touchset {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,6 +60,15 @@ $dark-knob-color: #fff;
   height: 100%;
   touch-action: none;
   cursor: pointer;
+
+  // Muted: dim the whole subtree (track, fill, and knob together - opacity on the parent covers
+  // all three in one rule) and stop it responding to drags, matching a disabled control. The mute
+  // *button* stays interactive either way; only the level control is affected.
+  &.muted {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+  }
 }
 
 .track {
@@ -110,6 +125,12 @@ $dark-knob-color: #fff;
 
   .dark & {
     color: #fff;
+  }
+
+  // Muted takes precedence over the light/dark variant either way - same specificity as `.dark &`
+  // above (two classes), so it must come after in source order to win when both apply.
+  &.muted {
+    color: $muted-color;
   }
 }
 

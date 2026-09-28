@@ -1,11 +1,16 @@
 .page {
   display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   height: 100%;
   padding: 68px 91px;
   background-color: #2e3233;
+
+  // No flex-direction/align-items here: .panel (width: 100%) is meant to fill this padded box
+  // completely, not be centered at its own content size. Without flex-direction:column, this was
+  // a row container, so align-items:center (the cross axis) shrink-wrapped .panel's height to its
+  // content instead of stretching it - starving .entryArea's flex:1 0 0 of any real space below and
+  // collapsing the keypad to nothing (see Keypad.module.scss's .key comment for the other half of
+  // that bug).
 }
 
 .panel {
@@ -78,6 +83,7 @@
 
 .display {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 424px;
