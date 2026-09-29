@@ -1,0 +1,45 @@
+.keypad {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: 424px;
+  // Clips the wrapped grid of square keys to this radius. A flex item's default minimum size is
+  // content-based (auto) unless its own overflow isn't visible, in which case it drops to 0 - so
+  // without flex-shrink:0 above, this element (unlike its sibling .display, which stays
+  // overflow:visible) had no floor and would collapse to nothing the moment its flex parent
+  // (.entryArea) came up short on space, taking the whole keypad down with it.
+  overflow: hidden;
+  border-radius: 0 0 10px 10px;
+}
+
+.key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 80px;
+  border: none;
+  background-color: #2e3233;
+  color: #fff;
+  cursor: pointer;
+}
+
+.digit {
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.letters {
+  font-weight: 300;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.label {
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 30px;
+}

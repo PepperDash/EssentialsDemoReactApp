@@ -1,0 +1,41 @@
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  width: 280px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2e3233;
+  cursor: pointer;
+  text-align: left;
+}
+
+.name {
+  width: 100%;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 30px;
+  color: #fff;
+}
+
+.currentRoutes {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-height: 50px;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #222325;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  color: #fff;
+
+  p {
+    margin: 0;
+  }
+}

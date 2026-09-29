@@ -1,0 +1,30 @@
+.outputs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.title {
+  width: 100%;
+  padding-bottom: 10px;
+  font-weight: 300;
+  font-size: 25px;
+  line-height: 38px;
+  color: #fff;
+  text-align: center;
+}
+
+.tileList {
+  display: flex;
+  flex: 1 0 0;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  width: 570px;
+  min-height: 0;
+}

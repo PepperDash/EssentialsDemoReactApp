@@ -1,0 +1,10 @@
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  width: 410px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}

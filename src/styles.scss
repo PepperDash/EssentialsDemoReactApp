@@ -1,0 +1,41 @@
+// Bootstrap variable overrides go above the import below; Bootstrap only honors a variable that is
+// defined before its own default.
+$border-radius: 0.5rem;
+
+@import 'bootstrap/scss/bootstrap.scss';
+
+// TODO: the demo's own theming lands here once the Figma designs are in.
+
+// Every page's layout is built on `height: 100%` chains (RoomBusiness's wrapper, SplashScreen,
+// RoomHome, TechLayout, ...) to fill the viewport and center/flex their content. A percentage
+// height only resolves against an ancestor with an explicit height, and nothing gave html/body/#root
+// one - so those chains had nothing to anchor to and collapsed to content size instead of the
+// viewport, leaving content top-aligned rather than centered.
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// Every icon/action button in this app (the header's icon buttons, fader mute buttons, every tech
+// page action button, ...) is a plain <button> styled entirely by its own CSS module, not a
+// Bootstrap `.btn`. Nothing resets the browser's native button chrome (border, background, font,
+// padding) for a bare <button>, so it was showing through as an unwanted border/background around
+// every one of them. Component-level rules still win over this via ordinary class-vs-element
+// specificity, so this is safe to apply everywhere.
+button {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}

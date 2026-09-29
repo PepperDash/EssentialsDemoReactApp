@@ -1,0 +1,140 @@
+$fill-color: #005294; // colors/primitive/blue-pdt
+$track-color: #e4e7e9;
+$knob-color: #2e3233;
+
+// Dark-background variant (tech Volume page) - the light variant's track/knob contrast (light gray
+// track, dark knob) inverts against a dark page background, so `.dark` swaps both plus the label
+// and mute icon color; the fill color is the same blue in both.
+$dark-track-color: #2e3233;
+$dark-knob-color: #fff;
+
+$muted-color: #a9201e; // colors/semantic/button-danger
+
+.fader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 140px;
+  height: 100%;
+}
+
+// Marker class for the dark-background variant - applied alongside .fader on the same element.
+// Never styled directly; every other rule below reads it as an ancestor (`.dark &`) to recolor
+// itself. It needs a rule of its own (even an empty one) purely so CSS Modules exports a token for
+// it - referenced only inside compound ancestor selectors, it would otherwise never appear as a
+// class Vite's CSS Modules plugin recognizes as "used" and generates a scoped name for.
+.dark {
+}
+
+.label {
+  width: 150px;
+  padding: 8px 0 16px;
+  font-size: 16px;
+  line-height: 26px;
+  color: #000;
+  text-align: center;
+
+  .dark & {
+    color: #fff;
+  }
+}
+
+.trackContainer {
+  display: flex;
+  align-items: center;
+  flex: 1 0 0;
+  min-height: 0;
+}
+
+// The draggable/tappable surface. Taller than the visible track so a touch near either end of the
+// fader still lands inside it - a 20px-wide hit target is unreasonably narrow on a touch panel.
+// Positioned so `.knob` (an absolutely-positioned sibling of `.track`, not a child - see .knob) has
+// something to anchor to; centers on the same axis .track does via align-items:center, so .knob's
+// left:50% lines up with .track's actual center too.
+.touchset {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+  height: 100%;
+  touch-action: none;
+  cursor: pointer;
+
+  // Muted: dim the whole subtree (track, fill, and knob together - opacity on the parent covers
+  // all three in one rule) and stop it responding to drags, matching a disabled control. The mute
+  // *button* stays interactive either way; only the level control is affected.
+  &.muted {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+  }
+}
+
+.track {
+  position: relative;
+  flex: 1 0 0;
+  min-height: 0;
+  width: 20px;
+  border-radius: 10px;
+  background-color: $track-color;
+  overflow: hidden;
+
+  .dark & {
+    background-color: $dark-track-color;
+  }
+}
+
+.fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: $fill-color;
+}
+
+.knob {
+  position: absolute;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: $knob-color;
+  transform: translate(-50%, 50%);
+  pointer-events: none;
+
+  .dark & {
+    background-color: $dark-knob-color;
+  }
+}
+
+.mutes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.muteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+  color: #000;
+
+  .dark & {
+    color: #fff;
+  }
+
+  // Muted takes precedence over the light/dark variant either way - same specificity as `.dark &`
+  // above (two classes), so it must come after in source order to win when both apply.
+  &.muted {
+    color: $muted-color;
+  }
+}
+
+.muteIcon {
+  width: 36px;
+  height: 36px;
+}

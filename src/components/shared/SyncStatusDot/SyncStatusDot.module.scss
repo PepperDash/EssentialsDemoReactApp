@@ -1,0 +1,15 @@
+.dot {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.detected {
+    background-color: #2e8442;
+  }
+
+  &.notDetected {
+    background-color: #de5252;
+  }
+}

@@ -1,0 +1,37 @@
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.IsOk {
+  background-color: #2e8442;
+}
+
+.InError {
+  background-color: #a9201e;
+}
+
+.InWarning {
+  background-color: #bea63f;
+  align-items: flex-start;
+  padding-top: 3px;
+}
+
+.StatusUnknown {
+  background-color: #3f4748;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.iconWarning {
+  width: 30px;
+  height: 30px;
+}

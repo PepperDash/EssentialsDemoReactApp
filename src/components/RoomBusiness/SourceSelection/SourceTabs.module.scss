@@ -1,0 +1,52 @@
+$active-color: #005294; // colors/semantic/button-active
+$text-color: #000;
+
+.sourceList {
+  display: flex;
+  align-items: center;
+  height: 95px;
+  padding: 0 40px;
+  background-color: #e4e7e9;
+  border-radius: 10px;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 180px;
+  height: 80px;
+  padding: 0 5px;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  &.active {
+    .label {
+      color: $active-color;
+    }
+
+    .underline {
+      visibility: visible;
+    }
+  }
+}
+
+.label {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 26px;
+  color: $text-color;
+  text-align: center;
+}
+
+.underline {
+  width: 174px;
+  height: 8px;
+  margin-top: 2px;
+  border-radius: 4px;
+  background-color: $active-color;
+  visibility: hidden;
+}

@@ -1,0 +1,103 @@
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.copyrights {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+  padding-bottom: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 272px;
+  height: 108px;
+  flex-shrink: 0;
+}
+
+.logoImage {
+  width: 237px;
+  height: 51px;
+}
+
+.copyrightText {
+  display: flex;
+  flex-direction: column;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 26px;
+  color: #fff;
+}
+
+.softwareInfo {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  flex-shrink: 0;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #4d4d4d;
+}
+
+.softwareInfoTitle {
+  flex: 1 0 0;
+  font-weight: 300;
+  font-size: 30px;
+  line-height: 38px;
+  color: #fff;
+}
+
+.programInfo {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  flex: 1 0 0;
+  min-height: 0;
+  padding: 10px 0;
+}
+
+.programText {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 26px;
+  color: #fff;
+}
+
+.pluginsHeading {
+  padding-top: 16px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 60px;
+  flex-shrink: 0;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2e3233;
+  cursor: pointer;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 22px;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+}

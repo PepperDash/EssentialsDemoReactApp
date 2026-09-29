@@ -1,0 +1,39 @@
+$inactive-color: #2e3233;
+$active-color: #005294;
+
+@keyframes pulse {
+  from {
+    background-color: $inactive-color;
+  }
+  to {
+    background-color: $active-color;
+  }
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 70px;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 10px;
+  background-color: $inactive-color;
+  cursor: pointer;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 22px;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+
+  &.active {
+    background-color: $active-color;
+  }
+
+  // In transition to this state (e.g. a display warming up or cooling down).
+  &.pulsing {
+    animation: pulse 0.75s ease-in-out infinite alternate;
+  }
+}
