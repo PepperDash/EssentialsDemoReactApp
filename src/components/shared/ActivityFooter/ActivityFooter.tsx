@@ -17,9 +17,8 @@ const EndSessionIcon = ({ className }: IconProps) => (
  * itself), so "Sharing" is a current-state indicator rather than a navigation target.
  *
  * "End Session" starts the room's shutdown *prompt* countdown (`StartShutdown(Manual)`), not an
- * immediate shutdown - `DemoRoom` finishes the shutdown itself when that timer elapses. The
- * Figma page for the countdown/cancel confirmation hasn't been provided yet, so there's no visible
- * countdown here; the timer still runs, just silently.
+ * immediate shutdown - `DemoRoom` finishes the shutdown itself when that timer elapses.
+ * `ShutdownPrompt` shows the confirmation and countdown while it runs.
  */
 export const ActivityFooter = () => {
   const roomKey = useRoomKey();

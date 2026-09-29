@@ -8,6 +8,7 @@ import SyncingPage from '../SyncingPage/SyncingPage';
 import SplashScreen from './SplashScreen';
 import RoomHome from './RoomHome';
 import HeaderModalOutlet from '../shared/HeaderModal/HeaderModalOutlet';
+import ShutdownPrompt from '../shared/ShutdownPrompt/ShutdownPrompt';
 import TechPinPage from '../TechControls/TechPin/TechPinPage';
 import TechLayout from '../TechControls/TechLayout/TechLayout';
 import SystemStatusPage from '../TechControls/SystemStatus/SystemStatusPage';
@@ -68,6 +69,7 @@ const RoomBusiness = () => {
         </Routes>
 
         <HeaderModalOutlet />
+        <ShutdownPrompt />
       </div>
     </HeaderModalProvider>
   );

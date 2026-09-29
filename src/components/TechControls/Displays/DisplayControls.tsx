@@ -2,6 +2,7 @@ import {
   useIHasPowerControl,
   useIHasSelectableItems,
   useIProjectorScreenLiftControl,
+  useTwoWayDisplayBase,
 } from '@pepperdash/mobile-control-react-app-core';
 import type { IHasInputsState } from '@pepperdash/mobile-control-react-app-core';
 import { TechDisplayConfig } from '../../../types/DemoRoomState';
@@ -16,6 +17,10 @@ import classes from './DisplayControls.module.scss';
  */
 export const DisplayControls = ({ display }: { display: TechDisplayConfig }) => {
   const power = useIHasPowerControl(display.deviceKey);
+  const displayState = useTwoWayDisplayBase(display.deviceKey)?.displayState;
+  const isWarming = displayState?.isWarming === true;
+  const isCooling = displayState?.isCooling === true;
+  const isTransitioning = isWarming || isCooling;
   const inputs = useIHasSelectableItems<IHasInputsState>(display.deviceKey);
   const screen = useIProjectorScreenLiftControl(display.screenDeviceKey ?? '');
   const lift = useIProjectorScreenLiftControl(display.liftDeviceKey ?? '');
@@ -25,10 +30,18 @@ export const DisplayControls = ({ display }: { display: TechDisplayConfig }) => 
   return (
     <div className={classes.controls}>
       <TechSection title="Power State">
-        <TechToggleButton active={power.powerState === false} onClick={power.powerOff}>
+        <TechToggleButton
+          active={!isTransitioning && power.powerState === false}
+          pulsing={isCooling}
+          onClick={power.powerOff}
+        >
           Power Off
         </TechToggleButton>
-        <TechToggleButton active={power.powerState === true} onClick={power.powerOn}>
+        <TechToggleButton
+          active={!isTransitioning && power.powerState === true}
+          pulsing={isWarming}
+          onClick={power.powerOn}
+        >
           Power On
         </TechToggleButton>
       </TechSection>
