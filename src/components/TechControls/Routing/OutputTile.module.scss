@@ -26,7 +26,7 @@
   flex-direction: column;
   gap: 0;
   width: 100%;
-  height: 50px;
+  min-height: 50px;
   padding: 10px;
   border-radius: 3px;
   background-color: #222325;
@@ -34,4 +34,8 @@
   font-size: 14px;
   line-height: 18px;
   color: #fff;
+
+  p {
+    margin: 0;
+  }
 }

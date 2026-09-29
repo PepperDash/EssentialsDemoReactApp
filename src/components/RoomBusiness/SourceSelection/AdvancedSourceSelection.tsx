@@ -34,7 +34,9 @@ export const AdvancedSourceSelection = () => {
   const selectedKey = stagedKey ?? offKey;
 
   const destinations = destinationList
-    ? Object.values(destinationList).sort((a, b) => a.order - b.order)
+    ? Object.values(destinationList)
+        .filter((d) => d.includeInDestinationList)
+        .sort((a, b) => a.order - b.order)
     : [];
 
   const handleSelectDestination = (sinkKey: string) => {
