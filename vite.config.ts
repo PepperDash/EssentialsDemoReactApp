@@ -122,6 +122,13 @@ export default defineConfig({
   // 404s bundle assets on nested routes and leaves the panel blank.
   base: '/mc/app/',
   plugins: [react(), clientErrorReporter()],
+  build: {
+    // Inline every SVG as a data URI, not just those under Vite's 4KB default. On the TSW-1070 the
+    // SVGs above that limit (emitted as separate /mc/app/assets/*.svg files) never rendered, even
+    // though the processor serves them correctly - while the inlined ones always did. Other asset
+    // types keep the default behavior.
+    assetsInlineLimit: (filePath) => (filePath.endsWith('.svg') ? true : undefined),
+  },
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
   },
