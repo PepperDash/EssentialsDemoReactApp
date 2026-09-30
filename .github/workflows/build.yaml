@@ -29,14 +29,18 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    steps:    
+    env:
+      # setup-node writes an .npmrc referencing ${NODE_AUTH_TOKEN} (because of registry-url below).
+      # Since setup-node v7 no longer exports a placeholder, every npm command fails if it's unset.
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
+    steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
-      - name: Use Node 20
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v7
+      - name: Use Node 24
+        uses: actions/setup-node@v7
         with:
           cache: npm
-          node-version: '20'
+          node-version: '24'
           registry-url: "https://npm.pkg.github.com"
       - name: Set package.json version
         run: |
@@ -82,7 +86,7 @@ jobs:
           echo "filename=${filename}" >> $GITHUB_OUTPUT      
       - name: Get release notes
         if: inputs.newVersion == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: change-log      
       - name: Create Release        
