@@ -20,7 +20,10 @@ export const HealthItem = ({ deviceKey }: { deviceKey: string }) => {
   // `communicationMonitorState` is typed as always present, but in practice it (like the rest of a
   // device's state) is only populated once `/fullStatus` actually returns - chain past it too.
   const state = monitor?.communicationMonitorState;
-  const status = (state?.status ?? 'StatusUnknown') as HealthStatus;
+  // The hook hands back the device's whole state, and `ICommunicationMonitorMessenger` nests the
+  // monitor under `commMonitor` ({ commMonitor: { isOnline, status } }). The top-level `status` the
+  // hook's type suggests is never sent, so reading it left every device "never online".
+  const status = (state?.commMonitor?.status ?? 'StatusUnknown') as HealthStatus;
   const minutes = useMinutesInStatus(status);
 
   return (
