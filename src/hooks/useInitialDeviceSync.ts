@@ -4,7 +4,7 @@ import {
   useIsSyncStateValuePresent,
   useRoomConfiguration,
   useRoomKey,
-  useWebsocketContext,
+  useSendBatchStatusRequest,
 } from '@pepperdash/mobile-control-react-app-core';
 import { useEffect, useMemo } from 'react';
 
@@ -60,13 +60,16 @@ function useRoomDeviceKeys(): Set<string> | undefined {
  * Requests full status for every device in the room, once, at boot.
  *
  * One `/system/batchDeviceFullStatus` message instead of a request per component: the processor
- * fans out to each device messenger in parallel and answers with a single
- * `/system/initialSyncComplete` when they have all replied. Pair it with
+ * fans out to each device messenger in parallel. The request asks for an aggregated reply, so the
+ * processor answers with a single `/system/batchDeviceStatus` message holding every device's state
+ * (applied to the store in one update) rather than one message per messenger followed by
+ * `/system/initialSyncComplete`. A processor without aggregation support replies the old way.
+ * Pair it with
  * `useHasCompletedInitialSync` to hold the UI until state is populated, so the app paints once
  * rather than flickering through empty state.
  */
 export function useInitialDeviceSync(): void {
-  const { sendMessage } = useWebsocketContext();
+  const sendBatchStatusRequest = useSendBatchStatusRequest();
   const dispatch = useAppDispatch();
   const devicesSynced = useIsSyncStateValuePresent('devicesSynced');
   const deviceKeys = useRoomDeviceKeys();
@@ -78,7 +81,7 @@ export function useInitialDeviceSync(): void {
       Array.from(deviceKeys).map((key) => [key, [FULL_STATUS]])
     );
 
-    sendMessage('/system/batchDeviceFullStatus', { devices });
+    sendBatchStatusRequest(devices);
     dispatch(uiActions.addSyncState('devicesSynced'));
-  }, [devicesSynced, deviceKeys, sendMessage, dispatch]);
+  }, [devicesSynced, deviceKeys, sendBatchStatusRequest, dispatch]);
 }
