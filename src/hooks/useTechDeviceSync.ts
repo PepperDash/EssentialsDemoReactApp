@@ -2,7 +2,7 @@ import {
   uiActions,
   useAppDispatch,
   useIsSyncStateValuePresent,
-  useWebsocketContext,
+  useSendUnrequestedBatchStatus,
 } from '@pepperdash/mobile-control-react-app-core';
 import { useEffect } from 'react';
 import { useTechDisplays } from './useTechDisplays';
@@ -19,9 +19,13 @@ const FULL_STATUS = '/fullStatus';
  * room's real AV devices - synced eagerly at boot by `useInitialDeviceSync` - there's no reason to
  * ask about them until a tech actually gets past the PIN gate. One batch covers every tech page
  * rather than each page syncing its own slice, since they all sit behind the same gate anyway.
+ *
+ * Only devices this connection hasn't already requested are sent (the boot sync may have covered some),
+ * and nothing is sent if there are none. `techDevicesSynced` is still set either way, because it records
+ * that the tech pages have asked.
  */
 export function useTechDeviceSync(): void {
-  const { sendMessage } = useWebsocketContext();
+  const sendUnrequestedBatchStatus = useSendUnrequestedBatchStatus();
   const dispatch = useAppDispatch();
   const techDevicesSynced = useIsSyncStateValuePresent('techDevicesSynced');
   const systemStatusDeviceKeys = useTechSystemStatusDeviceKeys();
@@ -49,7 +53,7 @@ export function useTechDeviceSync(): void {
 
     const devices = Object.fromEntries(deviceKeys.map((key) => [key, [FULL_STATUS]]));
 
-    sendMessage('/system/batchDeviceFullStatus', { devices });
+    sendUnrequestedBatchStatus(devices);
     dispatch(uiActions.addSyncState('techDevicesSynced'));
   }, [
     techDevicesSynced,
@@ -57,7 +61,7 @@ export function useTechDeviceSync(): void {
     rackSensorDeviceKey,
     displays,
     routingDeviceKey,
-    sendMessage,
+    sendUnrequestedBatchStatus,
     dispatch,
   ]);
 }
