@@ -4,7 +4,17 @@
 // band, lighting behavior). So the last theme the config asked for is remembered in localStorage
 // and applied here, before anything renders - and PanelThemeSync reloads once if the config asks
 // for a different one.
-const THEME_KEY = 'pd-panel-theme';
+//
+// Both stored preferences (this and the light/dark mode below) are keyed per panel, so panels
+// opened in the same browser don't share them. The panel's Mobile Control token is the only
+// identity available before the websocket connects: in the query on first load, then in the
+// session path (/mc/app/<token>/<roomKey>/).
+const pathSegments = location.pathname.split('/').filter(Boolean);
+const panelId =
+  new URLSearchParams(location.search).get('token') ??
+  (pathSegments.length >= 4 ? pathSegments[2] : undefined) ?? // only a full session path carries the token
+  'default';
+const THEME_KEY = `pd-panel-theme:${panelId}`;
 
 const readStoredTheme = () => {
   try {
@@ -43,7 +53,7 @@ export const applyConfiguredTheme = (configTheme: string) => {
 // data-mode attribute on <html> rather than React state - nothing re-renders. Remembered per panel
 // in localStorage; storage can be unavailable (private mode, locked-down browsers), so every access
 // is guarded and the panel just falls back to dark.
-const MODE_KEY = 'pd-midnight-mode';
+const MODE_KEY = `pd-midnight-mode:${panelId}`;
 
 export type MidnightMode = 'dark' | 'light';
 

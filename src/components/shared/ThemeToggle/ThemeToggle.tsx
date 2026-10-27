@@ -44,7 +44,7 @@ export const ThemeToggle = () => {
         type="button"
         role="switch"
         aria-checked={light}
-        aria-label={light ? 'Light theme' : 'Dark theme'}
+        aria-label="Light theme" // Fixed name; aria-checked says whether light mode is on.
         className={`${classes.track} ${light ? classes.on : ''}`}
         onClick={toggle}
       >
