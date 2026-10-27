@@ -14,7 +14,11 @@ const readStoredTheme = () => {
   }
 };
 
-if (readStoredTheme() === 'midnight') document.documentElement.dataset.theme = 'midnight';
+// Local development override: VITE_FORCE_THEME in .env.local (gitignored) pins the theme and
+// ignores the panel's config, for previewing a theme without editing the processor's config.
+const forcedTheme: string | undefined = import.meta.env.DEV ? import.meta.env.VITE_FORCE_THEME : undefined;
+
+if ((forcedTheme ?? readStoredTheme()) === 'midnight') document.documentElement.dataset.theme = 'midnight';
 
 // Fixed for the life of the page. Used to pick the thin outlined icon set, which the <img>-loaded
 // icons can't get from CSS.
@@ -23,7 +27,7 @@ export const isMidnight = document.documentElement.dataset.theme === 'midnight';
 /** Called with the panel's configured theme; reloads once if it doesn't match the page's. */
 export const applyConfiguredTheme = (configTheme: string) => {
   const wantMidnight = configTheme === 'midnight';
-  if (wantMidnight === isMidnight) return;
+  if (forcedTheme !== undefined || wantMidnight === isMidnight) return;
 
   try {
     localStorage.setItem(THEME_KEY, wantMidnight ? 'midnight' : 'classic');
