@@ -1,5 +1,7 @@
-$active-color: #005294; // colors/semantic/button-active
-$text-color: #000;
+@use '../../../theme/midnight' as *;
+
+$active-color: var(--pd-accent); // colors/semantic/button-active
+$text-color: var(--pd-text);
 
 .footer {
   display: flex;
@@ -7,7 +9,7 @@ $text-color: #000;
   justify-content: center;
   width: 100%;
   padding: 5px 10px;
-  background-color: #e4e7e9;
+  background-color: var(--pd-bar);
 }
 
 .button {
@@ -35,10 +37,11 @@ $text-color: #000;
 .icon {
   width: 88px;
   height: 80px;
+  filter: var(--pd-icon-filter);
 }
 
 .label {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
   color: $text-color;
@@ -51,4 +54,71 @@ $text-color: #000;
   border-radius: 4px;
   background-color: $active-color;
   visibility: hidden;
+}
+
+// Midnight: a full-width band, subtly lighter than the page. Buttons have no border or fill;
+// the selected activity gets a rounded accent-colored line under its label.
+.footer {
+  @include midnight {
+    gap: 40px;
+    padding: 10px 20px 8px;
+    position: relative;
+    z-index: 3; // Above the sources band - see RoomHome.module.scss.
+    border-top: 1px solid var(--pd-glass-border);
+    background: var(--pd-activity-band-bg);
+    box-shadow: var(--pd-band-shadow);
+  }
+}
+
+.button {
+  @include midnight {
+    gap: 6px;
+    width: 180px;
+    padding: 4px;
+
+    color: var(--pd-text);
+
+    &.active {
+      color: var(--pd-highlight); // Icon (currentColor) and label match the underline.
+
+      .label {
+        color: var(--pd-highlight);
+      }
+    }
+  }
+}
+
+.icon {
+  @include midnight {
+    width: 36px;
+    height: 36px;
+    filter: none;
+  }
+}
+
+.label {
+  @include midnight {
+    @include caps-label;
+    font-size: 13px;
+    line-height: 18px;
+  }
+}
+
+.underline {
+  @include midnight {
+    display: block; // IconButton wraps otherContent inline, which would ignore width/height.
+    width: 120px;
+    height: 4px;
+    margin: 6px auto 0;
+    border-radius: 2px;
+    background-color: var(--pd-highlight);
+    box-shadow: 0 0 12px rgba(var(--pd-glow), 0.95);
+  }
+}
+
+// Midnight's light/dark switch, pinned to the band's bottom-right corner.
+.themeToggle {
+  position: absolute;
+  right: 24px;
+  bottom: 18px;
 }

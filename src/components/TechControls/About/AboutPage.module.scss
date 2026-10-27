@@ -33,10 +33,10 @@
 .copyrightText {
   display: flex;
   flex-direction: column;
-  font-weight: 400;
+  font-weight: var(--pd-weight-regular);
   font-size: 20px;
   line-height: 26px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }
 
 .softwareInfo {
@@ -45,15 +45,15 @@
   gap: 50px;
   flex-shrink: 0;
   padding-bottom: 20px;
-  border-bottom: 2px solid #4d4d4d;
+  border-bottom: 2px solid var(--pd-divider);
 }
 
 .softwareInfoTitle {
   flex: 1 0 0;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 30px;
   line-height: 38px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }
 
 .programInfo {
@@ -72,10 +72,10 @@
   min-height: 0;
   height: 100%;
   overflow-y: auto;
-  font-weight: 400;
+  font-weight: var(--pd-weight-regular);
   font-size: 20px;
   line-height: 26px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }
 
 .pluginsHeading {
@@ -92,12 +92,12 @@
   padding: 10px 30px;
   border: none;
   border-radius: 10px;
-  background-color: #2e3233;
+  background-color: var(--pd-neutral);
   cursor: pointer;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
   white-space: nowrap;
 }

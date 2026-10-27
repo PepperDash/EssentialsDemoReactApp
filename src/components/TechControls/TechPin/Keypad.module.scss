@@ -21,25 +21,25 @@
   width: 140px;
   height: 80px;
   border: none;
-  background-color: #2e3233;
-  color: #fff;
+  background-color: var(--pd-neutral);
+  color: var(--pd-text-inverse);
   cursor: pointer;
 }
 
 .digit {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
 }
 
 .letters {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 20px;
   line-height: 30px;
 }
 
 .label {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
 }

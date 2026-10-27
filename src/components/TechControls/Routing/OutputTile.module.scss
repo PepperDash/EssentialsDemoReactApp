@@ -8,17 +8,17 @@
   padding: 10px;
   border: none;
   border-radius: 10px;
-  background-color: #2e3233;
+  background-color: var(--pd-neutral);
   cursor: pointer;
   text-align: left;
 }
 
 .name {
   width: 100%;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }
 
 .currentRoutes {
@@ -29,11 +29,11 @@
   min-height: 50px;
   padding: 10px;
   border-radius: 3px;
-  background-color: #222325;
-  font-weight: 400;
+  background-color: var(--pd-tech-bg);
+  font-weight: var(--pd-weight-regular);
   font-size: 14px;
   line-height: 18px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 
   p {
     margin: 0;

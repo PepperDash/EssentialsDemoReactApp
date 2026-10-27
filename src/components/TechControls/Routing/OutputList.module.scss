@@ -11,10 +11,10 @@
 .title {
   width: 100%;
   padding-bottom: 10px;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 25px;
   line-height: 38px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
 }
 

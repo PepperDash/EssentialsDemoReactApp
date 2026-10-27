@@ -8,10 +8,20 @@ import {
 import type { IconProps } from '@pepperdash/mobile-control-react-app-core';
 import { useNavigate } from 'react-router-dom';
 import { useHeaderModal } from '../../../hooks/useHeaderModal';
-import lightingIconUrl from '../../../assets/icons/lighting.svg';
-import helpIconUrl from '../../../assets/icons/help.svg';
-import audioControlsIconUrl from '../../../assets/icons/audio-controls.svg';
+import type { HeaderModalId } from '../../../context/HeaderModalContext';
+import classicLightingIconUrl from '../../../assets/icons/lighting.svg';
+import classicHelpIconUrl from '../../../assets/icons/help.svg';
+import classicAudioControlsIconUrl from '../../../assets/icons/audio-controls.svg';
+import midnightLightingIconUrl from '../../../assets/icons/midnight/lighting.svg';
+import midnightHelpIconUrl from '../../../assets/icons/midnight/help.svg';
+import midnightAudioControlsIconUrl from '../../../assets/icons/midnight/audio-controls.svg';
+import { isMidnight } from '../../../theme/theme';
+import companyLogoUrl from '../../../assets/branding/acme-logo.svg';
 import classes from './Header.module.scss';
+
+const lightingIconUrl = isMidnight ? midnightLightingIconUrl : classicLightingIconUrl;
+const helpIconUrl = isMidnight ? midnightHelpIconUrl : classicHelpIconUrl;
+const audioControlsIconUrl = isMidnight ? midnightAudioControlsIconUrl : classicAudioControlsIconUrl;
 
 // The core library's own <Clock /> component has a stray "new change" string left in its render
 // output (a debug leftover) - useTimeAndDate() is the same underlying hook without that bug, so
@@ -55,11 +65,16 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
   const roomKey = useRoomKey();
   const roomName = useRoomName(roomKey);
   const { time } = useTimeAndDate();
-  const { openModal } = useHeaderModal();
+  const { activeModal, openModal, closeModal } = useHeaderModal();
+  // Midnight: tapping the button for the modal that's already open closes it.
+  const toggleModal = (modal: HeaderModalId) =>
+    isMidnight && activeModal === modal ? closeModal() : openModal(modal);
+  const buttonClass = (modal: HeaderModalId) =>
+    `${classes.iconButton} ${activeModal === modal ? classes.active : ''}`;
   const navigate = useNavigate();
 
   const audioControlsPress = usePressHoldRelease({
-    onPressedButNotHeld: onAudioPress ?? (() => openModal('audio')),
+    onPressedButNotHeld: onAudioPress ?? (() => toggleModal('audio')),
     onHold: () => navigate('/techPin'),
     holdTimeMs: TECH_PIN_HOLD_MS,
   });
@@ -67,6 +82,7 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
   return (
     <header className={classes.header}>
       <div className={classes.left}>
+        {isMidnight && <img src={companyLogoUrl} alt="Acme" className={classes.companyLogo} />}
         <span className={classes.roomName}>{roomName}</span>
       </div>
 
@@ -77,21 +93,21 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
       <div className={classes.right}>
         <IconButton
           multiIcon={LightingIcon}
-          className={classes.iconButton}
+          className={buttonClass('lighting')}
           iconClassName={classes.icon}
           aria-label="Lighting"
-          onClick={onLightingPress ?? (() => openModal('lighting'))}
+          onClick={onLightingPress ?? (() => toggleModal('lighting'))}
         />
         <IconButton
           multiIcon={HelpIcon}
-          className={classes.iconButton}
+          className={buttonClass('help')}
           iconClassName={classes.icon}
           aria-label="Help"
-          onClick={onHelpPress ?? (() => openModal('help'))}
+          onClick={onHelpPress ?? (() => toggleModal('help'))}
         />
         <IconButton
           multiIcon={AudioControlsIcon}
-          className={classes.iconButton}
+          className={buttonClass('audio')}
           iconClassName={classes.icon}
           aria-label="Audio controls (hold 3 seconds for tech access)"
           {...audioControlsPress}

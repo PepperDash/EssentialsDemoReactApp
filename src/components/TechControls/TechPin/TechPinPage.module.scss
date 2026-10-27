@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   padding: 68px 91px;
-  background-color: #2e3233;
+  background-color: var(--pd-neutral);
 
   // No flex-direction/align-items here: .panel (width: 100%) is meant to fill this padded box
   // completely, not be centered at its own content size. Without flex-direction:column, this was
@@ -22,7 +22,7 @@
   width: 100%;
   padding: 0 20px 20px;
   border-radius: 20px;
-  background-color: #202528;
+  background-color: var(--pd-tech-panel);
 }
 
 .titleBar {
@@ -46,10 +46,10 @@
 }
 
 .title {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 36px;
   line-height: 58px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }
 
 .closeButton {
@@ -78,7 +78,7 @@
   min-height: 0;
   width: 100%;
   border-radius: 15px;
-  background-color: #c4c8cb;
+  background-color: var(--pd-keypad-light);
 }
 
 .display {
@@ -89,25 +89,25 @@
   width: 424px;
   padding: 10px 0;
   border-radius: 10px 10px 0 0;
-  background-color: #3f4748;
+  background-color: var(--pd-neutral-alt);
 
   &.displayIncorrect {
-    background-color: #a9201e; // colors/semantic/button-danger
+    background-color: var(--pd-danger); // colors/semantic/button-danger
   }
 }
 
 .displayText {
   min-height: 58px;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 36px;
   line-height: 58px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   letter-spacing: 8px;
 }
 
 .incorrectText {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 36px;
   line-height: 58px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }

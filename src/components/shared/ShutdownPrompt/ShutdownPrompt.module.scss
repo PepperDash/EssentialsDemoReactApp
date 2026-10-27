@@ -1,7 +1,9 @@
-$fill-color: #005294; // colors/primitive/blue-pdt
-$track-color: #e4e7e9;
-$danger-color: #a9201e; // colors/semantic/button-danger
-$neutral-color: #2e3233;
+@use '../../../theme/midnight' as *;
+
+$fill-color: var(--pd-accent); // colors/primitive/blue-pdt
+$track-color: var(--pd-bar);
+$danger-color: var(--pd-danger); // colors/semantic/button-danger
+$neutral-color: var(--pd-neutral);
 
 .overlay {
   position: fixed;
@@ -9,7 +11,7 @@ $neutral-color: #2e3233;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: var(--pd-scrim);
   z-index: 20;
 }
 
@@ -20,17 +22,17 @@ $neutral-color: #2e3233;
   gap: 20px;
   width: 520px;
   padding: 40px;
-  border: 4px solid #808080;
+  border: 4px solid var(--pd-border);
   border-radius: 10px;
-  background-color: #fff;
+  background-color: var(--pd-surface);
 }
 
 .title {
   margin: 0;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 30px;
   line-height: 38px;
-  color: #000;
+  color: var(--pd-text);
 }
 
 .message,
@@ -38,7 +40,7 @@ $neutral-color: #2e3233;
   margin: 0;
   font-size: 18px;
   line-height: 24px;
-  color: #000;
+  color: var(--pd-text);
   text-align: center;
 }
 
@@ -74,10 +76,10 @@ $neutral-color: #2e3233;
   width: 200px;
   height: 60px;
   border-radius: 10px;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }
 
 .confirmButton {
@@ -86,4 +88,57 @@ $neutral-color: #2e3233;
 
 .cancelButton {
   background-color: $neutral-color;
+}
+
+.overlay {
+  @include midnight {
+    @include blurred-scrim;
+  }
+}
+
+.panel {
+  @include midnight {
+    @include glass-panel;
+    position: relative; // Above the overlay's ::before scrim.
+    border-radius: 20px;
+  }
+}
+
+.title {
+  @include midnight {
+    @include caps-label;
+    font-size: 22px;
+  }
+}
+
+.progressTrack {
+  @include midnight {
+    background: var(--pd-track-bg);
+    box-shadow: var(--pd-track-shadow);
+  }
+}
+
+.progressFill {
+  @include midnight {
+    background: linear-gradient(90deg, #e08a00, #ffb020, #ffd27a);
+  }
+}
+
+.confirmButton,
+.cancelButton {
+  @include midnight {
+    @include glass;
+    border-radius: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 15px;
+  }
+}
+
+.confirmButton {
+  @include midnight {
+    border-color: rgba(255, 140, 130, 0.6);
+    background: linear-gradient(180deg, rgba(232, 84, 76, 0.85), rgba(170, 36, 30, 0.85));
+    color: #fff; // White on red in both modes - glass text color would be dark in light mode.
+  }
 }

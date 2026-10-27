@@ -1,12 +1,16 @@
-$inactive-color: #2e3233;
-$active-color: #005294;
+$inactive-color: var(--pd-neutral);
+$active-color: var(--pd-accent);
+// Midnight's dark text on its amber accent; the original theme has no --pd-on-active and keeps white.
+$active-text: var(--pd-on-active, var(--pd-text-inverse));
 
 @keyframes pulse {
   from {
     background-color: $inactive-color;
+    color: var(--pd-text-inverse);
   }
   to {
     background-color: $active-color;
+    color: $active-text;
   }
 }
 
@@ -21,15 +25,16 @@ $active-color: #005294;
   border-radius: 10px;
   background-color: $inactive-color;
   cursor: pointer;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
   white-space: nowrap;
 
   &.active {
     background-color: $active-color;
+    color: $active-text;
   }
 
   // In transition to this state (e.g. a display warming up or cooling down).

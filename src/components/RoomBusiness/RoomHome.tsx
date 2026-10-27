@@ -5,6 +5,7 @@ import ActivityFooter from '../shared/ActivityFooter/ActivityFooter';
 import ToggleSwitch from '../shared/ToggleSwitch/ToggleSwitch';
 import BasicSourceSelection from './SourceSelection/BasicSourceSelection';
 import AdvancedSourceSelection from './SourceSelection/AdvancedSourceSelection';
+import { isMidnight } from '../../theme/theme';
 import classes from './RoomHome.module.scss';
 
 /**
@@ -21,28 +22,47 @@ import classes from './RoomHome.module.scss';
  */
 export const RoomHome = () => {
   const [advancedSharing, setAdvancedSharing] = useState(false);
+  // Midnight shows the source buttons in their own full-width band above the activity footer.
+  // Basic/advanced selection still own the buttons and portal them into this element; undefined
+  // (the original theme) keeps them inline in the content area.
+  const [sourceBand, setSourceBand] = useState<HTMLDivElement | null>(null);
+  const tabsContainer = isMidnight ? sourceBand : undefined;
+
+  // Midnight moves this toggle into the sources band too.
+  const advancedToggle = (
+    <ToggleSwitch
+      caption={advancedSharing || isMidnight ? 'Advanced' : 'Advanced Sharing'}
+      on={advancedSharing}
+      onChange={setAdvancedSharing}
+    />
+  );
 
   return (
     <div className={classes.page}>
       <Header />
 
       <div className={classes.main}>
-        <div className={classes.leftGutter}>
-          <ToggleSwitch
-            caption={advancedSharing ? 'Advanced' : 'Advanced Sharing'}
-            on={advancedSharing}
-            onChange={setAdvancedSharing}
-          />
-        </div>
+        <div className={classes.leftGutter}>{!isMidnight && advancedToggle}</div>
 
         <div className={classes.content}>
-          {advancedSharing ? <AdvancedSourceSelection /> : <BasicSourceSelection />}
+          {advancedSharing ? (
+            <AdvancedSourceSelection tabsContainer={tabsContainer} />
+          ) : (
+            <BasicSourceSelection tabsContainer={tabsContainer} />
+          )}
         </div>
 
         <div className={classes.rightGutter}>
           <Fader />
         </div>
       </div>
+
+      {isMidnight && (
+        <div className={classes.sourceBand}>
+          <div className={classes.bandToggle}>{advancedToggle}</div>
+          <div ref={setSourceBand} />
+        </div>
+      )}
 
       <ActivityFooter />
     </div>

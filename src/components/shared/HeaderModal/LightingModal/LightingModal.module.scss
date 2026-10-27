@@ -1,3 +1,5 @@
+@use '../../../../theme/midnight' as *;
+
 .sceneList {
   display: flex;
   flex-direction: column;
@@ -10,10 +12,23 @@
 }
 
 .title {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #000;
+  color: var(--pd-text);
+}
+
+.sceneGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+
+  // Midnight: one interlocked control - adjacent buttons sharing borders, rounded only at the
+  // group's outer corners.
+  @include midnight {
+    gap: 0;
+  }
 }
 
 .sceneButton {
@@ -24,9 +39,9 @@
   padding: 10px 30px;
   border: none;
   border-radius: 10px;
-  background-color: #2e3233;
-  color: #fff;
-  font-weight: 300;
+  background-color: var(--pd-neutral);
+  color: var(--pd-text-inverse);
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
   cursor: pointer;
@@ -34,6 +49,54 @@
 
 .empty {
   font-size: 16px;
-  color: #000;
+  color: var(--pd-text);
   text-align: center;
+}
+
+.title {
+  @include midnight {
+    @include caps-label;
+    font-size: 16px;
+    padding-bottom: 6px;
+  }
+}
+
+.sceneButton {
+  @include midnight {
+    @include glass;
+    position: relative;
+    padding: 22px 30px;
+    border-radius: 0;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08); // Group-level shadow is on the ends.
+
+    & + & {
+      margin-top: -1px; // Collapse the shared border between neighbors.
+    }
+
+    &:first-child {
+      border-radius: 14px 14px 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 14px 14px;
+      box-shadow: var(--pd-glass-shadow);
+    }
+
+    &:only-child {
+      border-radius: 14px;
+    }
+
+    &.active {
+      @include glass-active;
+      z-index: 1; // Its accent border sits over its neighbors' shared borders.
+    }
+
+    &.pulsing {
+      @include pulse(scene-pulse, 'var(--pd-glass-shadow)');
+    }
+
+    &.active.pulsing {
+      @include pulse(active-scene-pulse, 'var(--pd-active-shadow)');
+    }
+  }
 }

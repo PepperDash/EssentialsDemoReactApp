@@ -1,3 +1,5 @@
+@use '../../../../theme/midnight' as *;
+
 .wrapper {
   display: flex;
   align-items: center;
@@ -16,7 +18,7 @@
 .divider {
   width: 3px;
   height: 500px;
-  background-color: #e4e7e9;
+  background-color: var(--pd-bar);
   flex-shrink: 0;
 }
 
@@ -25,4 +27,11 @@
   align-items: flex-end;
   height: 500px;
   padding: 0 40px 0 20px;
+}
+
+.divider {
+  @include midnight {
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--pd-divider-line), transparent);
+  }
 }

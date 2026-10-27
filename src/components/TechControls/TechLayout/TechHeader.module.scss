@@ -5,7 +5,7 @@
   width: 100%;
   height: 75px;
   padding: 0 20px;
-  background-color: #000;
+  background-color: var(--pd-tech-header);
   flex-shrink: 0;
 }
 
@@ -29,20 +29,20 @@
 }
 
 .roomName {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .time {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   white-space: nowrap;
 }
 
@@ -53,11 +53,11 @@
   padding: 10px 30px;
   border: none;
   border-radius: 10px;
-  background-color: #2e3233;
+  background-color: var(--pd-neutral);
   cursor: pointer;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   white-space: nowrap;
 }

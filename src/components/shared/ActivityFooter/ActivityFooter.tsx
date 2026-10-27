@@ -1,16 +1,47 @@
 import { IconButton, useIShutdownPromptTimer, useRoomKey } from '@pepperdash/mobile-control-react-app-core';
 import type { IconProps } from '@pepperdash/mobile-control-react-app-core';
-import sharingIconUrl from '../../../assets/icons/activity-sharing.svg';
-import endSessionIconUrl from '../../../assets/icons/activity-end-session.svg';
+import classicSharingIconUrl from '../../../assets/icons/activity-sharing.svg';
+import classicEndSessionIconUrl from '../../../assets/icons/activity-end-session.svg';
+import { isMidnight } from '../../../theme/theme';
+import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import classes from './ActivityFooter.module.scss';
 
-const SharingIcon = ({ className }: IconProps) => (
-  <img src={sharingIconUrl} alt="" className={className} />
+// Midnight draws thin outlined icons inline, so they follow the button's CSS `color` (blue when
+// active) - an <img>-loaded SVG can't.
+const OutlineIcon = ({ className, children }: IconProps & { children: React.ReactNode }) => (
+  <svg
+    className={className}
+    viewBox="0 0 48 48"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {children}
+  </svg>
 );
 
-const EndSessionIcon = ({ className }: IconProps) => (
-  <img src={endSessionIconUrl} alt="" className={className} />
-);
+const SharingIcon = ({ className }: IconProps) =>
+  isMidnight ? (
+    <OutlineIcon className={className}>
+      <rect x="5" y="8" width="38" height="26" rx="2.5" />
+      <path d="M17 41h14M24 34v7" />
+    </OutlineIcon>
+  ) : (
+    <img src={classicSharingIconUrl} alt="" className={className} />
+  );
+
+const EndSessionIcon = ({ className }: IconProps) =>
+  isMidnight ? (
+    <OutlineIcon className={className}>
+      <path d="M24 6v16" />
+      <path d="M15 11.5a15 15 0 1 0 18 0" />
+    </OutlineIcon>
+  ) : (
+    <img src={classicEndSessionIconUrl} alt="" className={className} />
+  );
 
 /**
  * Room-wide activity bar. This demo has one activity (sharing - the source selection screen
@@ -52,6 +83,12 @@ export const ActivityFooter = () => {
           </>
         }
       />
+
+      {isMidnight && (
+        <div className={classes.themeToggle}>
+          <ThemeToggle />
+        </div>
+      )}
     </div>
   );
 };

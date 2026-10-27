@@ -7,7 +7,7 @@
   width: 250px;
   padding-right: 4px;
   overflow: hidden;
-  background-color: #121416;
+  background-color: var(--pd-tech-nav);
   flex-shrink: 0;
 }
 
@@ -19,16 +19,18 @@
   align-items: center;
   justify-content: center;
   padding: 15px 50px;
-  background-color: #2e3233;
+  background-color: var(--pd-neutral);
   cursor: pointer;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
   text-decoration: none;
 
   &.active {
-    background-color: #005294;
+    background-color: var(--pd-accent);
+    // Midnight's dark text on its amber accent; the original theme has no --pd-on-active and keeps white.
+    color: var(--pd-on-active, var(--pd-text-inverse));
   }
 }

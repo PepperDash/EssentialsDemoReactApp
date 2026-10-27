@@ -1,5 +1,8 @@
 import { roomOffSourceKey, useRoomKey, useRoomSourceList } from '@pepperdash/mobile-control-react-app-core';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { isMidnight } from '../../../theme/theme';
 import classes from './SourceTabs.module.scss';
+
 
 interface SourceTabsProps {
   /** The tab to highlight - a source-list item key, or undefined to highlight nothing. */
@@ -21,6 +24,25 @@ interface SourceTabsProps {
 export const SourceTabs = ({ selectedKey, onSelect }: SourceTabsProps) => {
   const roomKey = useRoomKey();
   const sourceList = useRoomSourceList(roomKey);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [slider, setSlider] = useState<{ left: number; width: number }>();
+
+  // Midnight: one shared underline that slides to whichever tab is active, instead of each tab
+  // showing its own. Re-measured on resize, since the tab widths follow the font and labels.
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!isMidnight || !list) return;
+
+    const measure = () => {
+      const active = list.querySelector<HTMLElement>(`.${classes.active}`);
+      setSlider(active ? { left: active.offsetLeft, width: active.offsetWidth } : undefined);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [selectedKey, sourceList]);
 
   if (!sourceList) return null;
 
@@ -35,7 +57,7 @@ export const SourceTabs = ({ selectedKey, onSelect }: SourceTabsProps) => {
     : contentEntries.map(([key, item]) => ({ key, label: item.preferredName }));
 
   return (
-    <div className={classes.sourceList}>
+    <div className={classes.sourceList} ref={listRef}>
       {tabs.map((tab) => (
         <button
           key={tab.key}
@@ -47,6 +69,12 @@ export const SourceTabs = ({ selectedKey, onSelect }: SourceTabsProps) => {
           <span className={classes.underline} />
         </button>
       ))}
+      {isMidnight && slider && (
+        <span
+          className={classes.slider}
+          style={{ width: slider.width, transform: `translateX(${slider.left}px)` }}
+        />
+      )}
     </div>
   );
 };

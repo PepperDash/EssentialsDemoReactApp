@@ -12,9 +12,9 @@
 }
 
 .synced {
-  background-color: #2e8442;
+  background-color: var(--pd-success);
 }
 
 .notSynced {
-  background-color: #a9201e;
+  background-color: var(--pd-danger);
 }

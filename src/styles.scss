@@ -4,7 +4,150 @@ $border-radius: 0.5rem;
 
 @import 'bootstrap/scss/bootstrap.scss';
 
-// TODO: the demo's own theming lands here once the Figma designs are in.
+// Fine grain laid over the page backgrounds: an SVG turbulence tile at low opacity.
+$noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E");
+
+// Theme tokens. Every component module reads its colors from these variables instead of hardcoding
+// them, so a theme is just a block that redefines them. `:root` is the original light design; a
+// theme is picked with `data-theme` on <html> (see index.html).
+:root {
+  --pd-surface: #fff; // user-page backgrounds, modals
+  --pd-text: #000; // text on surface/bar
+  --pd-text-inverse: #fff; // text on dark tiles and tech pages
+  --pd-bar: #e4e7e9; // header, footer, tabs, fader tracks
+  --pd-accent: #005294; // colors/semantic/button-active
+  --pd-danger: #a9201e; // colors/semantic/button-danger
+  --pd-success: #2e8442;
+  --pd-warning: #bea63f;
+  --pd-error: #de5252;
+  --pd-neutral: #2e3233; // dark buttons and tiles
+  --pd-neutral-alt: #3f4748;
+  --pd-card: #2b2f30; // destination cards
+  --pd-pill: #d9d9d9;
+  --pd-on-pill: #000;
+  --pd-knob: #fff; // toggle-switch knob
+  --pd-tech-bg: #222325;
+  --pd-tech-header: #000;
+  --pd-tech-nav: #121416;
+  --pd-tech-panel: #202528;
+  --pd-border: #808080;
+  --pd-divider: #4d4d4d;
+  --pd-keypad-light: #c4c8cb;
+  --pd-focus: #0d6efd;
+  --pd-scrim: rgba(0, 0, 0, 0.7);
+  --pd-icon-filter: none; // header/footer icons are black SVGs loaded through <img>
+  --pd-logo-filter: none;
+  --pd-company-logo-filter: none; // Header's company logo (dark gray artwork)
+  --pd-weight-light: 300;
+  --pd-weight-regular: 400;
+  --pd-page-bg: var(--pd-surface);
+}
+
+// Midnight: deep navy surfaces with an amber accent. The <img> icons and logo can't take a CSS color,
+// so they're flattened to white with a filter to stay visible on the dark bars.
+[data-theme='midnight'] {
+  --pd-surface: #0b1424;
+  --pd-text: #e6edf7;
+  --pd-text-inverse: #fff;
+  --pd-bar: rgba(255, 255, 255, 0.04);
+  --pd-accent: #ffb020;
+  --pd-danger: #d6453f;
+  --pd-success: #2fa866;
+  --pd-warning: #e0b341;
+  --pd-error: #ff6b6b;
+  --pd-neutral: #26375a;
+  --pd-neutral-alt: #33476e;
+  --pd-card: #1a2a48;
+  --pd-pill: #ffb020;
+  --pd-on-pill: #fff;
+  --pd-knob: #fff;
+  --pd-tech-bg: #0e1a2e;
+  --pd-tech-header: #060d19;
+  --pd-tech-nav: #091222;
+  --pd-tech-panel: #14213a;
+  --pd-border: rgba(255, 255, 255, 0.16);
+  --pd-divider: #26375a;
+  --pd-keypad-light: #8fa3c4;
+  --pd-focus: #ffb020;
+  --pd-scrim: rgba(3, 8, 18, 0.45);
+  --pd-icon-filter: brightness(0) invert(1);
+  --pd-logo-filter: brightness(0) invert(1);
+  --pd-company-logo-filter: brightness(0) invert(1) opacity(0.92);
+
+  // Lighter type: Inter (bundled, so panels without internet still get it), one step thinner.
+  --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bs-body-font-weight: 300;
+  --pd-weight-light: 200;
+  --pd-weight-regular: 300;
+
+  // Several monochrome radial glows at different centers over the base navy.
+  --pd-page-bg: #{$noise}, radial-gradient(ellipse 55% 60% at 12% 18%, rgba(46, 84, 150, 0.55), transparent 70%),
+    radial-gradient(ellipse 45% 50% at 88% 22%, rgba(34, 66, 124, 0.5), transparent 70%),
+    radial-gradient(ellipse 60% 55% at 72% 88%, rgba(40, 76, 140, 0.45), transparent 70%),
+    radial-gradient(ellipse 50% 45% at 22% 92%, rgba(24, 48, 96, 0.5), transparent 70%),
+    radial-gradient(ellipse 35% 35% at 50% 50%, rgba(30, 58, 110, 0.35), transparent 70%), #08111f;
+
+  // Glass buttons and panels.
+  --pd-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04));
+  --pd-glass-border: rgba(255, 255, 255, 0.16);
+  --pd-glass-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --pd-panel-bg: rgba(16, 28, 50, 0.55);
+  --pd-active-bg: linear-gradient(180deg, #ffc247, #ee950a);
+  --pd-active-border: rgba(255, 214, 140, 0.8);
+  --pd-active-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 12px 18px -8px rgba(var(--pd-glow-deep), 0.95),
+    inset 0 -3px 8px rgba(255, 226, 160, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --pd-band-bg: rgba(255, 255, 255, 0.04);
+  // Accent glows, as RGB triplets for rgba(): --pd-glow for bright halos, --pd-glow-deep for the
+  // soft shadows under active controls.
+  --pd-glow: 255, 192, 77;
+  --pd-glow-deep: 245, 150, 10;
+  --pd-on-active: #2a1a00; // Text and icons on an accent-filled control.
+  --pd-highlight: #ffc04d; // Selected source and activity: text, icon and underline.
+  --pd-source-band-bg: rgba(14, 25, 45, 0.92);
+  --pd-activity-band-bg: rgba(18, 31, 55, 0.96);
+  --pd-band-shadow: 0 -10px 24px rgba(0, 0, 0, 0.38);
+  --pd-track-bg: linear-gradient(90deg, #0a1426 0%, #15233e 50%, #0a1426 100%);
+  --pd-track-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.06);
+  --pd-divider-line: rgba(255, 255, 255, 0.22);
+}
+
+// Midnight's light mode, switched by the Theme toggle in the activity footer (data-mode="light"
+// on <html>, see theme/theme.ts). Same design, daylight colors: pale blue-gray glows instead of
+// navy, frosted white glass, dark text. The tech pages keep their dark palette in both modes.
+[data-theme='midnight'][data-mode='light'] {
+  color-scheme: light;
+  --pd-surface: #f3f6fb;
+  --pd-text: #1a2436;
+  --pd-bar: rgba(255, 255, 255, 0.45);
+  --pd-card: #ffffff;
+  --pd-scrim: rgba(225, 232, 243, 0.4);
+  --pd-icon-filter: brightness(0) opacity(0.78); // Thin white icons rendered as dark gray.
+  --pd-logo-filter: none;
+  --pd-company-logo-filter: none;
+  --bs-body-color: #1a2436;
+  --bs-body-bg: #f3f6fb;
+
+  --pd-page-bg: #{$noise}, radial-gradient(ellipse 55% 60% at 12% 18%, rgba(196, 214, 240, 0.9), transparent 70%),
+    radial-gradient(ellipse 45% 50% at 88% 22%, rgba(208, 222, 244, 0.85), transparent 70%),
+    radial-gradient(ellipse 60% 55% at 72% 88%, rgba(188, 207, 236, 0.8), transparent 70%),
+    radial-gradient(ellipse 50% 45% at 22% 92%, rgba(214, 226, 245, 0.85), transparent 70%),
+    radial-gradient(ellipse 35% 35% at 50% 50%, rgba(255, 255, 255, 0.7), transparent 70%), #e7edf6;
+
+  --pd-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.5));
+  --pd-glass-border: rgba(26, 46, 82, 0.13);
+  --pd-glass-shadow: 0 8px 20px rgba(30, 55, 100, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --pd-panel-bg: rgba(255, 255, 255, 0.6);
+  --pd-active-shadow: 0 8px 20px rgba(30, 55, 100, 0.18), 0 12px 18px -8px rgba(var(--pd-glow-deep), 0.8),
+    inset 0 -3px 8px rgba(255, 226, 160, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  --pd-highlight: #b86e00; // Darker than dark mode's so it reads on a pale band.
+  --pd-source-band-bg: rgba(255, 255, 255, 0.62);
+  --pd-activity-band-bg: rgba(255, 255, 255, 0.82);
+  --pd-band-shadow: 0 -8px 22px rgba(30, 55, 100, 0.1);
+  --pd-track-bg: linear-gradient(90deg, #c9d4e4 0%, #dfe6f1 50%, #c9d4e4 100%);
+  --pd-track-shadow: inset 0 1px 3px rgba(30, 55, 100, 0.3), 0 1px 0 rgba(255, 255, 255, 0.8);
+  --pd-divider-line: rgba(26, 46, 82, 0.2);
+}
 
 // Every page's layout is built on `height: 100%` chains (RoomBusiness's wrapper, SplashScreen,
 // RoomHome, TechLayout, ...) to fill the viewport and center/flex their content. A percentage

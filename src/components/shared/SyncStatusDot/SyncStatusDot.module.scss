@@ -1,3 +1,5 @@
+@use '../../../theme/midnight' as *;
+
 .dot {
   display: inline-block;
   width: 15px;
@@ -6,10 +8,42 @@
   flex-shrink: 0;
 
   &.detected {
-    background-color: #2e8442;
+    background-color: var(--pd-success);
   }
 
   &.notDetected {
-    background-color: #de5252;
+    background-color: var(--pd-error);
+  }
+}
+
+// Midnight: lit-LED look - a domed highlight and darker rim over the base color, a small specular
+// glare, and a halo in the LED's own color (via currentColor). Sized in % so it scales with `size`.
+.dot {
+  @include midnight {
+    position: relative;
+    background-image: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.55) 0, rgba(255, 255, 255, 0.12) 32%, transparent 55%),
+      radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.28) 100%);
+    box-shadow: 0 0 3px currentColor, inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+
+    &.detected {
+      color: rgba(47, 168, 102, 0.45); // --pd-success, as the halo
+    }
+
+    &.notDetected {
+      color: rgba(255, 107, 107, 0.45); // --pd-error, as the halo
+    }
+
+    // The glare: a small bright elliptical reflection near the top-left.
+    &::after {
+      content: '';
+      position: absolute;
+      top: 14%;
+      left: 22%;
+      width: 34%;
+      height: 24%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 75%);
+      transform: rotate(-30deg);
+    }
   }
 }

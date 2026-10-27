@@ -9,21 +9,21 @@
 }
 
 .IsOk {
-  background-color: #2e8442;
+  background-color: var(--pd-success);
 }
 
 .InError {
-  background-color: #a9201e;
+  background-color: var(--pd-danger);
 }
 
 .InWarning {
-  background-color: #bea63f;
+  background-color: var(--pd-warning);
   align-items: flex-start;
   padding-top: 3px;
 }
 
 .StatusUnknown {
-  background-color: #3f4748;
+  background-color: var(--pd-neutral-alt);
 }
 
 .icon {

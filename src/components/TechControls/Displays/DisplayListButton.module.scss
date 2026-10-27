@@ -8,18 +8,20 @@
   padding: 10px 30px;
   border: none;
   border-radius: 10px;
-  background-color: #2e3233;
+  background-color: var(--pd-neutral);
   cursor: pointer;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 
   &.active {
-    background-color: #005294;
+    background-color: var(--pd-accent);
+    // Midnight's dark text on its amber accent; the original theme has no --pd-on-active and keeps white.
+    color: var(--pd-on-active, var(--pd-text-inverse));
   }
 }

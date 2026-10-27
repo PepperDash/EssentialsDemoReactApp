@@ -1,9 +1,11 @@
+@use '../../theme/midnight' as *;
+
 .page {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background-color: #fff;
+  background: var(--pd-page-bg);
 }
 
 .main {
@@ -33,4 +35,34 @@
   justify-content: center;
   gap: 10px;
   padding: 10px 0;
+}
+
+// Midnight layering: the controls sit lowest, the sources band above them, and the activity
+// footer above the band - each band casts a soft shadow up onto the layer beneath it.
+.main {
+  @include midnight {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// Midnight's full-width band for the source buttons and the Advanced toggle, between the main
+// area and the activity footer.
+.sourceBand {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 20px 6px;
+  border-top: 1px solid var(--pd-glass-border);
+  background: var(--pd-source-band-bg);
+  box-shadow: var(--pd-band-shadow);
+}
+
+.bandToggle {
+  position: absolute;
+  top: 50%;
+  left: 24px;
+  transform: translateY(-50%);
 }

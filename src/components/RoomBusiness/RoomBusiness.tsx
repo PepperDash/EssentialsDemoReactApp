@@ -1,4 +1,5 @@
 import { useRoomIsOn, useRoomKey, useRoomState } from '@pepperdash/mobile-control-react-app-core';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useHasCompletedInitialSync } from '../../hooks/useHasCompletedInitialSync';
 import { useInitialDeviceSync } from '../../hooks/useInitialDeviceSync';
@@ -7,6 +8,8 @@ import { HeaderModalProvider } from '../../context/HeaderModalProvider';
 import SyncingPage from '../SyncingPage/SyncingPage';
 import SplashScreen from './SplashScreen';
 import RoomHome from './RoomHome';
+import PageFade from './PageFade/PageFade';
+import { isMidnight } from '../../theme/theme';
 import HeaderModalOutlet from '../shared/HeaderModal/HeaderModalOutlet';
 import ShutdownPrompt from '../shared/ShutdownPrompt/ShutdownPrompt';
 import TechPinPage from '../TechControls/TechPin/TechPinPage';
@@ -31,6 +34,17 @@ const RoomBusiness = () => {
   const isOn = useRoomIsOn(roomKey);
   const hasCompletedInitialSync = useHasCompletedInitialSync();
 
+  // Midnight: fade from the splash screen to the controls when the room turns on during this
+  // session - not when the page first loads with the room already on.
+  const [fading, setFading] = useState(false);
+  const wasOn = useRef(isOn);
+  useEffect(() => {
+    if (isMidnight && isOn && wasOn.current === false) setFading(true);
+    if (!isOn) setFading(false);
+    wasOn.current = isOn;
+  }, [isOn]);
+  const endFade = useCallback(() => setFading(false), []);
+
   // Ask the processor for the state of every device in the room, once, as soon as the room config
   // arrives.
   useInitialDeviceSync();
@@ -52,7 +66,19 @@ const RoomBusiness = () => {
               behind isOn rather than living under its own path. /techPin (held from the header's
               audio icon) and the tech pages behind it need to work whether or not the room is on,
               so they're routes here regardless of isOn, unlike the splash/home split. */}
-          <Route path="/" element={isOn ? <RoomHome /> : <SplashScreen />} />
+          <Route
+            path="/"
+            element={
+              isOn ? (
+                <>
+                  <RoomHome />
+                  {fading && <PageFade outgoing={<SplashScreen />} onDone={endFade} />}
+                </>
+              ) : (
+                <SplashScreen />
+              )
+            }
+          />
           <Route path="/techPin" element={<TechPinPage />} />
 
           {/* All five tech sections are built. */}

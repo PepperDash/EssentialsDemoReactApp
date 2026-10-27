@@ -15,9 +15,9 @@
   gap: 20px;
   width: 100%;
   padding: 10px 0;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 25px;
   line-height: 38px;
-  color: #000;
+  color: var(--pd-text);
   text-align: center;
 }
