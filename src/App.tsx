@@ -1,5 +1,6 @@
 import { MobileControlProvider } from '@pepperdash/mobile-control-react-app-core';
 import RoomBusiness from './components/RoomBusiness/RoomBusiness';
+import PanelThemeSync from './theme/PanelThemeSync';
 
 /**
  * Application root.
@@ -12,6 +13,7 @@ import RoomBusiness from './components/RoomBusiness/RoomBusiness';
 function App() {
   return (
     <MobileControlProvider>
+      <PanelThemeSync />
       <RoomBusiness />
     </MobileControlProvider>
   );

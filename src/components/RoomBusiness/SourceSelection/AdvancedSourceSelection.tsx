@@ -8,6 +8,7 @@ import {
 import { useState } from 'react';
 import DestinationCard from './DestinationCard';
 import SourceTabs from './SourceTabs';
+import { placeSourceTabs } from './placeSourceTabs';
 import classes from './AdvancedSourceSelection.module.scss';
 
 /**
@@ -19,7 +20,12 @@ import classes from './AdvancedSourceSelection.module.scss';
  * destination right now", not a fact about the system. `DemoRoom.SelectedSourceKey` (basic mode's
  * one-source-for-the-room field) has no meaning here.
  */
-export const AdvancedSourceSelection = () => {
+interface AdvancedSourceSelectionProps {
+  /** Where to render the source buttons - see `placeSourceTabs`. */
+  tabsContainer?: HTMLElement | null;
+}
+
+export const AdvancedSourceSelection = ({ tabsContainer }: AdvancedSourceSelectionProps) => {
   const roomKey = useRoomKey();
   const sourceList = useRoomSourceList(roomKey);
   const destinationList = useRoomDestinationList(roomKey);
@@ -60,7 +66,7 @@ export const AdvancedSourceSelection = () => {
 
       <p className={classes.instruction}>Select a source below then a destination above</p>
 
-      <SourceTabs selectedKey={selectedKey} onSelect={setStagedKey} />
+      {placeSourceTabs(<SourceTabs selectedKey={selectedKey} onSelect={setStagedKey} />, tabsContainer)}
     </>
   );
 };

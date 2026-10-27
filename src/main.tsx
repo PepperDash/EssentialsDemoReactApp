@@ -4,6 +4,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
+import '@fontsource/inter/200.css';
+import '@fontsource/inter/300.css';
+import '@fontsource/inter/400.css';
 import './styles.scss';
 
 // Mirrors the <base> calculation in index.html. Mobile Control serves the app from a

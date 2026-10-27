@@ -18,22 +18,22 @@
   width: 500px;
   padding: 40px;
   border-radius: 20px;
-  background-color: #202528;
+  background-color: var(--pd-tech-panel);
 }
 
 .title {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 30px;
   line-height: 38px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
 }
 
 .message {
-  font-weight: 400;
+  font-weight: var(--pd-weight-regular);
   font-size: 20px;
   line-height: 26px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
 }
 
@@ -47,10 +47,10 @@
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
 }
 
@@ -60,9 +60,9 @@
 }
 
 .confirmButton {
-  background-color: #a9201e;
+  background-color: var(--pd-danger);
 }
 
 .cancelButton {
-  background-color: #2e3233;
+  background-color: var(--pd-neutral);
 }

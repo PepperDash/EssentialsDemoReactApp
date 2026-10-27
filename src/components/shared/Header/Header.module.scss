@@ -1,3 +1,5 @@
+@use '../../../theme/midnight' as *;
+
 .header {
   display: flex;
   align-items: center;
@@ -5,7 +7,7 @@
   width: 100%;
   height: 75px;
   padding: 0 20px;
-  background-color: #e4e7e9;
+  background-color: var(--pd-bar);
   flex-shrink: 0;
 }
 
@@ -27,21 +29,29 @@
   flex-shrink: 0;
 }
 
+.companyLogo {
+  height: 30px;
+  width: auto;
+  margin-right: 16px;
+  flex-shrink: 0;
+  filter: var(--pd-company-logo-filter);
+}
+
 .roomName {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #000;
+  color: var(--pd-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .time {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #000;
+  color: var(--pd-text);
   white-space: nowrap;
 }
 
@@ -59,4 +69,44 @@
 .icon {
   width: 50px;
   height: 50px;
+  filter: var(--pd-icon-filter);
+}
+
+.header {
+  @include midnight {
+    border-bottom: 1px solid var(--pd-glass-border);
+  }
+}
+
+.roomName {
+  @include midnight {
+    @include caps-label;
+    font-size: 18px;
+  }
+}
+
+.iconButton {
+  @include midnight {
+    width: 54px;
+    height: 54px;
+    gap: 0; // IconButton adds an empty element after the icon; its 8px gap pushed the icon off center.
+    margin-left: 12px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    // Active (its modal is open): an outline and a soft accent glow underneath.
+    &.active {
+      border-color: var(--pd-active-border);
+      box-shadow: 0 10px 16px -8px rgba(var(--pd-glow-deep), 0.9);
+      @include pulse(header-button-pulse, '0 10px 16px -8px rgba(var(--pd-glow-deep), 0.9)');
+    }
+  }
+}
+
+.icon {
+  @include midnight {
+    width: 30px;
+    height: 30px;
+  }
 }

@@ -3,6 +3,7 @@ import { DemoRoomState } from '../../../types/DemoRoomState';
 import { useVideoSyncDetected } from '../../../hooks/useVideoSyncDetected';
 import SyncStatusDot from '../../shared/SyncStatusDot/SyncStatusDot';
 import SourceTabs from './SourceTabs';
+import { placeSourceTabs } from './placeSourceTabs';
 import classes from './BasicSourceSelection.module.scss';
 
 /**
@@ -10,7 +11,12 @@ import classes from './BasicSourceSelection.module.scss';
  * fans out to every display via `DemoRoom.RunRouteAction`'s route list - there is no per-display
  * choice here (that's what `AdvancedSourceSelection` is for).
  */
-export const BasicSourceSelection = () => {
+interface BasicSourceSelectionProps {
+  /** Where to render the source buttons - see `placeSourceTabs`. */
+  tabsContainer?: HTMLElement | null;
+}
+
+export const BasicSourceSelection = ({ tabsContainer }: BasicSourceSelectionProps) => {
   const roomKey = useRoomKey();
   const roomState = useRoomState<DemoRoomState>(roomKey);
   const sourceList = useRoomSourceList(roomKey);
@@ -39,10 +45,13 @@ export const BasicSourceSelection = () => {
         )}
       </div>
 
-      <SourceTabs
-        selectedKey={selectedKey}
-        onSelect={(key) => routeAction?.runRoute({ sourceListItemKey: key })}
-      />
+      {placeSourceTabs(
+        <SourceTabs
+          selectedKey={selectedKey}
+          onSelect={(key) => routeAction?.runRoute({ sourceListItemKey: key })}
+        />,
+        tabsContainer
+      )}
     </>
   );
 };

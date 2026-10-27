@@ -1,0 +1,63 @@
+@use '../../../theme/midnight' as *;
+
+// Matches the Advanced toggle in the sources band: small caps caption to the left of a glass pill.
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.caption {
+  @include caps-label;
+  font-size: 11px;
+  color: var(--pd-text);
+}
+
+.track {
+  @include glass;
+  position: relative;
+  width: 76px;
+  height: 40px;
+  border-radius: 85px;
+
+  // Stays glass when on - only the knob moves and its icon changes.
+  &.on {
+    @include pulse(theme-toggle-pulse, 'var(--pd-glass-shadow)');
+
+    .knob {
+      transform: translateX(36px);
+    }
+  }
+}
+
+.knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 1; // Covers the icon of the inactive mode.
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fff, #d6e2f5);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  color: var(--pd-text);
+  transform: translateY(-50%);
+}
+
+// Sun on the left (shown once the knob moves right into light mode), moon on the right (shown
+// while the knob sits left in dark mode).
+.sun {
+  left: 11px;
+}
+
+.moon {
+  right: 11px;
+}

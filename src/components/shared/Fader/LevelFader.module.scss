@@ -1,14 +1,16 @@
-$fill-color: #005294; // colors/primitive/blue-pdt
-$track-color: #e4e7e9;
-$knob-color: #2e3233;
+@use '../../../theme/midnight' as *;
+
+$fill-color: var(--pd-accent); // colors/primitive/blue-pdt
+$track-color: var(--pd-bar);
+$knob-color: var(--pd-neutral);
 
 // Dark-background variant (tech Volume page) - the light variant's track/knob contrast (light gray
 // track, dark knob) inverts against a dark page background, so `.dark` swaps both plus the label
 // and mute icon color; the fill color is the same blue in both.
-$dark-track-color: #2e3233;
-$dark-knob-color: #fff;
+$dark-track-color: var(--pd-neutral);
+$dark-knob-color: var(--pd-text-inverse);
 
-$muted-color: #a9201e; // colors/semantic/button-danger
+$muted-color: var(--pd-danger); // colors/semantic/button-danger
 
 .fader {
   display: flex;
@@ -31,11 +33,11 @@ $muted-color: #a9201e; // colors/semantic/button-danger
   padding: 8px 0 16px;
   font-size: 16px;
   line-height: 26px;
-  color: #000;
+  color: var(--pd-text);
   text-align: center;
 
   .dark & {
-    color: #fff;
+    color: var(--pd-text-inverse);
   }
 }
 
@@ -121,10 +123,10 @@ $muted-color: #a9201e; // colors/semantic/button-danger
   justify-content: center;
   width: 55px;
   height: 55px;
-  color: #000;
+  color: var(--pd-text);
 
   .dark & {
-    color: #fff;
+    color: var(--pd-text-inverse);
   }
 
   // Muted takes precedence over the light/dark variant either way - same specificity as `.dark &`
@@ -137,4 +139,51 @@ $muted-color: #a9201e; // colors/semantic/button-danger
 .muteIcon {
   width: 36px;
   height: 36px;
+}
+
+// Midnight: a recessed, three-dimensional channel for the empty track, an accent gradient for the
+// filled part, and a glassy knob.
+.label {
+  @include midnight {
+    @include caps-label;
+    font-size: 12px;
+  }
+}
+
+.track {
+  @include midnight {
+    width: 18px;
+    background: var(--pd-track-bg);
+    box-shadow: var(--pd-track-shadow);
+  }
+}
+
+.fill {
+  @include midnight {
+    background: linear-gradient(0deg, #d47800 0%, #ffb020 55%, #ffdc8f 100%);
+    box-shadow: 0 0 12px rgba(var(--pd-glow-deep), 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-radius: 9px;
+  }
+}
+
+.knob {
+  @include midnight {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: radial-gradient(circle at 35% 30%, #fff, #c9d6ec 60%, #8a9bb8);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55), 0 0 0 4px rgba(255, 255, 255, 0.06);
+  }
+}
+
+// Muted: the fill turns red. Dims less than the original theme so the red stays readable.
+.touchset.muted {
+  @include midnight {
+    opacity: 0.8;
+
+    .fill {
+      background: linear-gradient(0deg, #8f1d18 0%, #d6453f 55%, #ff8a80 100%);
+      box-shadow: 0 0 12px rgba(214, 69, 63, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+  }
 }

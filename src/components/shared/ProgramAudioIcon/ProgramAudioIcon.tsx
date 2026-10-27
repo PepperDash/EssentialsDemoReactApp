@@ -1,3 +1,5 @@
+import { isMidnight } from '../../../theme/theme';
+
 interface ProgramAudioIconProps {
   className?: string;
 }
@@ -10,20 +12,29 @@ interface ProgramAudioIconProps {
  * raster assets. Uses `currentColor` so the caller drives white-on-dark vs. black-on-light purely
  * through CSS `color`, rather than needing two image files for what is otherwise one icon.
  */
+// Midnight draws the speaker as a thin outline instead of a solid shape.
+const strokeWidth = isMidnight ? 1 : 2;
+
 export const ProgramAudioIcon = ({ className }: ProgramAudioIconProps) => (
   <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-    <polygon points="3,9 3,15 7.5,15 13,20 13,4 7.5,9" fill="currentColor" />
+    <polygon
+      points="3,9 3,15 7.5,15 13,20 13,4 7.5,9"
+      fill={isMidnight ? 'none' : 'currentColor'}
+      stroke={isMidnight ? 'currentColor' : 'none'}
+      strokeWidth={strokeWidth}
+      strokeLinejoin="round"
+    />
     <path
       d="M16.5 8.5a5 5 0 0 1 0 7"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       fill="none"
     />
     <path
       d="M19 5.5a9.5 9.5 0 0 1 0 13"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       fill="none"
     />

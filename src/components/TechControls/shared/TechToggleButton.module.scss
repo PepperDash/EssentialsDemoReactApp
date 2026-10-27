@@ -1,5 +1,5 @@
-$inactive-color: #2e3233;
-$active-color: #005294;
+$inactive-color: var(--pd-neutral);
+$active-color: var(--pd-accent);
 
 @keyframes pulse {
   from {
@@ -21,10 +21,10 @@ $active-color: #005294;
   border-radius: 10px;
   background-color: $inactive-color;
   cursor: pointer;
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 18px;
   line-height: 22px;
-  color: #fff;
+  color: var(--pd-text-inverse);
   text-align: center;
   white-space: nowrap;
 

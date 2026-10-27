@@ -3,10 +3,10 @@
 }
 
 .message {
-  font-weight: 300;
+  font-weight: var(--pd-weight-light);
   font-size: 24px;
   line-height: 30px;
-  color: #000;
+  color: var(--pd-text);
   text-align: center;
   // The config value may contain its own line breaks (Figma's own example wraps to two lines) -
   // respect them if present, rather than collapsing to one line and only wrapping on overflow.

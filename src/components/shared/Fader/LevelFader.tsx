@@ -1,6 +1,7 @@
 import { IconButton, useDeviceIBasicVolumeWithFeedback } from '@pepperdash/mobile-control-react-app-core';
 import type { IconProps } from '@pepperdash/mobile-control-react-app-core';
 import { useCallback, useRef } from 'react';
+import { isMidnight } from '../../../theme/theme';
 import classes from './LevelFader.module.scss';
 
 const MAX_LEVEL = 65535;
@@ -47,6 +48,64 @@ const MicMuteActiveIcon = ({ className }: IconProps) => (
     />
   </svg>
 );
+
+// Midnight's thin outlined versions of the four icons above.
+const OutlineIcon = ({ className, children }: IconProps & { children: React.ReactNode }) => (
+  <svg
+    className={className}
+    width="36"
+    height="36"
+    viewBox="0 0 36 36"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {children}
+  </svg>
+);
+
+const speakerOutline = <path d="M4 14h5l7-6v20l-7-6H4z" />;
+const micOutline = (
+  <>
+    <rect x="13" y="4" width="10" height="17" rx="5" />
+    <path d="M8 16a10 10 0 0 0 20 0M18 26v6M13 32h10" />
+  </>
+);
+
+const OutlineSpeakerMuteIcon = ({ className }: IconProps) => (
+  <OutlineIcon className={className}>
+    {speakerOutline}
+    <path d="M21 13.5a6 6 0 0 1 0 9M25 9.5a11.5 11.5 0 0 1 0 17" />
+  </OutlineIcon>
+);
+
+const OutlineSpeakerMuteActiveIcon = ({ className }: IconProps) => (
+  <OutlineIcon className={className}>
+    {speakerOutline}
+    <path d="M22 14l8 8M30 14l-8 8" />
+  </OutlineIcon>
+);
+
+const OutlineMicMuteIcon = ({ className }: IconProps) => <OutlineIcon className={className}>{micOutline}</OutlineIcon>;
+
+const OutlineMicMuteActiveIcon = ({ className }: IconProps) => (
+  <OutlineIcon className={className}>
+    {micOutline}
+    <path d="M5 5l26 26" />
+  </OutlineIcon>
+);
+
+const muteIcons = isMidnight
+  ? {
+      speaker: OutlineSpeakerMuteIcon,
+      speakerMuted: OutlineSpeakerMuteActiveIcon,
+      mic: OutlineMicMuteIcon,
+      micMuted: OutlineMicMuteActiveIcon,
+    }
+  : { speaker: SpeakerMuteIcon, speakerMuted: SpeakerMuteActiveIcon, mic: MicMuteIcon, micMuted: MicMuteActiveIcon };
 
 interface LevelFaderProps {
   /** Shown above the track. Omitted on the room page's single master fader (no other fader to
@@ -110,11 +169,11 @@ export const LevelFader = ({ label, isMic, dark, volume }: LevelFaderProps) => {
   const fillPercent = Math.min(100, Math.max(0, (volumeState.level / MAX_LEVEL) * 100));
   const MuteIcon = volumeState.muted
     ? isMic
-      ? MicMuteActiveIcon
-      : SpeakerMuteActiveIcon
+      ? muteIcons.micMuted
+      : muteIcons.speakerMuted
     : isMic
-      ? MicMuteIcon
-      : SpeakerMuteIcon;
+      ? muteIcons.mic
+      : muteIcons.speaker;
 
   return (
     <div className={`${classes.fader} ${dark ? classes.dark : ''}`}>

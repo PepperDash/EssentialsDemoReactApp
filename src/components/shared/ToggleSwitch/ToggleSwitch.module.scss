@@ -1,6 +1,8 @@
-$off-bg: #2e3233;
-$on-bg: #005294; // colors/semantic/button-active
-$knob-color: #fff;
+@use '../../../theme/midnight' as *;
+
+$off-bg: var(--pd-neutral);
+$on-bg: var(--pd-accent); // colors/semantic/button-active
+$knob-color: var(--pd-knob);
 
 .wrapper {
   display: flex;
@@ -12,7 +14,7 @@ $knob-color: #fff;
 .caption {
   font-size: 16px;
   line-height: 26px;
-  color: #000;
+  color: var(--pd-text);
   text-align: center;
 }
 
@@ -51,7 +53,7 @@ $knob-color: #fff;
   flex: 1;
   font-size: 16px;
   line-height: 26px;
-  color: #fff;
+  color: var(--pd-text-inverse);
 }
 
 .knob {
@@ -63,4 +65,48 @@ $knob-color: #fff;
   border-radius: 85px;
   background-color: $knob-color;
   transition: transform 0.15s ease;
+}
+
+.wrapper {
+  @include midnight {
+    flex-direction: row; // Caption to the left of the switch.
+    gap: 10px;
+  }
+}
+
+.caption {
+  @include midnight {
+    @include caps-label;
+    font-size: 11px;
+  }
+}
+
+.track {
+  @include midnight {
+    @include glass;
+
+    &.on {
+      @include glass-active;
+      @include pulse(toggle-pulse, 'var(--pd-active-shadow)');
+    }
+  }
+}
+
+.knob {
+  @include midnight {
+    background: linear-gradient(180deg, #fff, #d6e2f5);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+  }
+}
+
+.label {
+  @include midnight {
+    color: var(--pd-text);
+  }
+}
+
+.track.on .label {
+  @include midnight {
+    color: var(--pd-on-active);
+  }
 }
