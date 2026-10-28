@@ -1,0 +1,136 @@
+// Adapted from the Dev Tools app's RoutingDeviceNode.module.scss for the dark tech pages.
+
+.nodeCard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--pd-border);
+  border-radius: 8px;
+  background-color: var(--pd-tech-panel);
+  color: var(--pd-text-inverse);
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.nodeHeader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 12px;
+  background-color: var(--pd-neutral);
+  font-weight: var(--pd-weight-regular);
+  font-size: 16px;
+  line-height: 20px;
+}
+
+.nodeKeyLabel {
+  font-size: 12px;
+  line-height: 16px;
+  opacity: 0.6;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nodeBody {
+  position: relative;
+}
+
+.handle {
+  background: var(--pd-border);
+}
+
+.portRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+
+  & + & {
+    border-top: 1px solid var(--pd-divider);
+  }
+}
+
+.portLabelWrap {
+  position: relative;
+  z-index: 2;
+  max-width: 46%;
+  min-width: 0;
+}
+
+.portLabelWrapEnd {
+  text-align: right;
+}
+
+.portLabelText {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 6px;
+  border-radius: 4px;
+  background-color: var(--pd-tech-panel);
+}
+
+.portStatic {
+  opacity: 0.6;
+}
+
+// A tappable port, shown when route editing is available for that side of the device.
+.portButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--pd-border);
+  color: var(--pd-text-inverse);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &.portButtonEnd {
+    justify-content: flex-end;
+    text-align: right;
+  }
+}
+
+.portButtonActive {
+  border-color: var(--pd-accent);
+  box-shadow: 0 0 0 1px var(--pd-accent);
+}
+
+// Route command sent, awaiting confirmation from the processor.
+.portPending {
+  flex-shrink: 0;
+  color: var(--pd-accent);
+  font-size: 10px;
+  animation: portPendingPulse 1s ease-in-out infinite;
+}
+
+@keyframes portPendingPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.portTimedOut {
+  flex-shrink: 0;
+  color: var(--pd-warning);
+  font-weight: 700;
+}
+
+.internalRouteSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}

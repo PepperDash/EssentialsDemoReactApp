@@ -10,7 +10,8 @@
 // identity available before the websocket connects: in the query on first load, then in the
 // session path (/mc/app/<token>/<roomKey>/).
 const pathSegments = location.pathname.split('/').filter(Boolean);
-const panelId =
+/** Identifies this panel for its stored preferences (see above). */
+export const panelId =
   new URLSearchParams(location.search).get('token') ??
   (pathSegments.length >= 4 ? pathSegments[2] : undefined) ?? // only a full session path carries the token
   'default';
