@@ -16,3 +16,12 @@
   gap: 30px;
   padding-top: 20px;
 }
+
+// Graph mode fills the rest of the page, edge to edge.
+.graph {
+  display: flex;
+  flex: 1 0 0;
+  align-self: stretch;
+  min-height: 0;
+  margin-bottom: -20px;
+}
