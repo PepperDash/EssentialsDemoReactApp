@@ -22,6 +22,17 @@ const OutlineIcon = ({ className, children }: IconProps & { children: React.Reac
   </svg>
 );
 
+// The original theme's icons are single-color artwork. Drawn as a mask filled with the button's
+// `color`, so the active one takes the accent color (which can be changed in Settings) instead of
+// the blue baked into the file.
+const MaskIcon = ({ src, className }: IconProps & { src: string }) => (
+  <span
+    className={`${className ?? ''} ${classes.maskIcon}`}
+    style={{ maskImage: `url(${src})`, WebkitMaskImage: `url(${src})` }}
+    aria-hidden="true"
+  />
+);
+
 const SharingIcon = ({ className }: IconProps) =>
   isMidnight ? (
     <OutlineIcon className={className}>
@@ -29,7 +40,7 @@ const SharingIcon = ({ className }: IconProps) =>
       <path d="M17 41h14M24 34v7" />
     </OutlineIcon>
   ) : (
-    <img src={classicSharingIconUrl} alt="" className={className} />
+    <MaskIcon src={classicSharingIconUrl} className={className} />
   );
 
 const EndSessionIcon = ({ className }: IconProps) =>
@@ -39,7 +50,7 @@ const EndSessionIcon = ({ className }: IconProps) =>
       <path d="M15 11.5a15 15 0 1 0 18 0" />
     </OutlineIcon>
   ) : (
-    <img src={classicEndSessionIconUrl} alt="" className={className} />
+    <MaskIcon src={classicEndSessionIconUrl} className={className} />
   );
 
 /**
