@@ -236,12 +236,15 @@ export const RoutingGraphView = () => {
   // renders, so dragged positions survive route changes.
   useEffect(() => {
     if (!loaded) return;
+    // One toggle hides both unwired devices and unwired ports. Routing is unaffected: a tapped port
+    // is resolved against the full device (handlePortClick), so a hidden port is never hidden from
+    // the popover's choices.
     const { nodes: layoutNodes, edges: layoutEdges } = buildGraph(
       graphData,
       NO_FILTER,
       hideUnconnected,
       NO_FILTER,
-      false,
+      hideUnconnected,
       sinkRoutes
     );
     setNodes(

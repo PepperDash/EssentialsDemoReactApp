@@ -34,7 +34,8 @@ const devices: RoutingDevice[] = [
     inputPorts: sourceKeys.map((k) => port(k)),
     outputPorts: [port('display-1'), port('display-2'), port('programAudio', 'Audio')],
   },
-  { key: 'display-1', name: 'Left Display', hasInputs: true, hasOutputs: false, hasInputsAndOutputs: false, inputPorts: [port('hdmiIn1')] },
+  // Like the mock display, it has more inputs than are wired.
+  { key: 'display-1', name: 'Left Display', hasInputs: true, hasOutputs: false, hasInputsAndOutputs: false, inputPorts: [port('hdmiIn1'), port('hdmiIn2')] },
   { key: 'display-2', name: 'Right Display', hasInputs: true, hasOutputs: false, hasInputsAndOutputs: false, inputPorts: [port('hdmiIn1')] },
   { key: 'program-audio', name: 'Program Audio', hasInputs: true, hasOutputs: false, hasInputsAndOutputs: false, inputPorts: [port('anyAudioIn', 'Audio')] },
   { key: 'audio-lectern-mic', name: 'Lectern Mic', hasInputs: false, hasOutputs: true, hasInputsAndOutputs: false, outputPorts: [port('out', 'Audio')] },
@@ -71,6 +72,17 @@ describe('buildGraph with the demo topology', () => {
   it('keeps unwired devices when "hide unconnected" is off', () => {
     const { nodes } = buildGraph({ devices, tieLines }, NONE, false, NONE, false, {});
     expect(nodes.map((n) => n.id)).toContain('audio-lectern-mic');
+  });
+
+  it('hides unwired ports when asked', () => {
+    const inputsOfLeftDisplay = (hidePorts: boolean) => {
+      const { nodes } = buildGraph({ devices, tieLines }, NONE, true, NONE, hidePorts, {});
+      const node = nodes.find((n) => n.id === 'display-1')!;
+      return (node.data as { device: RoutingDevice }).device.inputPorts!.map((p) => p.key);
+    };
+
+    expect(inputsOfLeftDisplay(true)).toEqual(['hdmiIn1']);
+    expect(inputsOfLeftDisplay(false)).toEqual(['hdmiIn1', 'hdmiIn2']);
   });
 
   it('lays sources out left of the matrix, and the matrix left of the displays', () => {
