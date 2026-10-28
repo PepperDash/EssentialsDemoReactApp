@@ -25,10 +25,13 @@ const OutlineIcon = ({ className, children }: IconProps & { children: React.Reac
 // The original theme's icons are single-color artwork. Drawn as a mask filled with the button's
 // `color`, so the active one takes the accent color (which can be changed in Settings) instead of
 // the blue baked into the file.
+//
+// The URL must be quoted: the build inlines SVGs as data URIs containing single quotes, which make
+// an unquoted url() invalid, so the mask was dropped and the icon drew as a filled box.
 const MaskIcon = ({ src, className }: IconProps & { src: string }) => (
   <span
     className={`${className ?? ''} ${classes.maskIcon}`}
-    style={{ maskImage: `url(${src})`, WebkitMaskImage: `url(${src})` }}
+    style={{ maskImage: `url("${src}")`, WebkitMaskImage: `url("${src}")` }}
     aria-hidden="true"
   />
 );
