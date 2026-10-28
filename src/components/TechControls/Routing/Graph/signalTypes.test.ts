@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   atomsOf,
+  carriesAtom,
   flagsContainAll,
   flagsIntersect,
   formatSignalFlags,
@@ -172,5 +173,21 @@ describe('atomsOf', () => {
   it('returns atoms in source order', () => {
     expect(atomsOf('AudioVideo')).toEqual(['Audio', 'Video']);
     expect(atomsOf('UsbOutput, UsbInput')).toEqual(['UsbOutput', 'UsbInput']);
+  });
+});
+
+describe('carriesAtom', () => {
+  it('is true when the reported type includes the atom', () => {
+    expect(carriesAtom('AudioVideo', 'Video')).toBe(true);
+    expect(carriesAtom('Audio, SecondaryAudio', 'Audio')).toBe(true);
+  });
+
+  it('is false when the reported type leaves the atom out', () => {
+    expect(carriesAtom('Audio', 'Video')).toBe(false);
+  });
+
+  it('treats an unreported type as carrying everything', () => {
+    expect(carriesAtom('', 'Video')).toBe(true);
+    expect(carriesAtom(undefined, 'Audio')).toBe(true);
   });
 });

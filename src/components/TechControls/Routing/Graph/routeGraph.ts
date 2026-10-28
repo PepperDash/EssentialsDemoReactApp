@@ -34,7 +34,7 @@ import {
   RoutingDevicesAndTieLines,
   TieLine,
 } from './routingTypes';
-import { atomsOf, parseSignalFlags } from './signalTypes';
+import { atomsOf, carriesAtom, parseSignalFlags } from './signalTypes';
 
 /** A tie line with its signal type pre-parsed, so traversal never re-parses strings. */
 interface IndexedTieLine {
@@ -251,15 +251,17 @@ function findCandidateSources(
 /**
  * Explains an empty candidate list.
  *
- * Routing is driven by the tie lines in the configuration, so "no sources" has exactly two causes
- * and they need completely different fixes: either nothing is wired to the port at all (a config
- * problem), or what is wired shares no part of the requested signal type (pick another type).
+ * Routing is driven by the tie lines in the configuration, so "no sources" usually has one of two
+ * causes, which need completely different fixes: either nothing is wired to the port at all (a
+ * config problem), or what is wired shares no part of the requested signal type (pick another
+ * type).
  *
  * The second case needs a DISJOINT type, not merely a narrower one: a candidate qualifies on any
  * single matching atom, so a Video tie line still answers an AudioVideo request - badged "video
- * only". Emptiness therefore means no incoming tie line carries any atom of the request at all.
- * Since a matching tie line always contributes at least its own source device, these two cases are
- * exhaustive.
+ * only".
+ *
+ * A third, rarer case: a tie line does carry the type, but nothing it leads back to can be offered.
+ * Its source is missing from the device list, or the wiring loops back to this device.
  */
 function describeNoCandidates(
   index: RouteIndex,
@@ -274,6 +276,14 @@ function describeNoCandidates(
 
   if (incoming.length === 0) {
     return 'Nothing is wired to this input. Routing follows the tie lines in the configuration, and this port has none.';
+  }
+
+  const atoms = atomsOf(signalType);
+  const carriesRequest = incoming.some((t) =>
+    atoms.some((atom) => carriesAtom(t.tieLine.signalType, atom))
+  );
+  if (carriesRequest) {
+    return `This input is wired for ${signalType}, but no device it's wired back to can be selected as a source.`;
   }
 
   const wiredFor = [...new Set(incoming.map((t) => t.tieLine.signalType))].join(

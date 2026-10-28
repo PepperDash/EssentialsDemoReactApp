@@ -2,6 +2,7 @@ import { useINamedRoutingSlots } from '@pepperdash/mobile-control-react-app-core
 import type { SignalType } from '@pepperdash/mobile-control-react-app-core';
 import { lazy, Suspense, useState } from 'react';
 import { useTechRoutingDeviceKey } from '../../../hooks/useTechRoutingDeviceKey';
+import GraphErrorBoundary from './GraphErrorBoundary';
 import InputList, { NONE_INPUT } from './InputList';
 import MatrixSelect from './MatrixSelect';
 import OutputList from './OutputList';
@@ -42,9 +43,11 @@ export const RoutingPage = () => {
       <RoutingModeSelect mode={mode} onChange={setMode} />
       {mode === 'graph' ? (
         <div className={classes.graph}>
-          <Suspense fallback={null}>
-            <RoutingGraphView />
-          </Suspense>
+          <GraphErrorBoundary>
+            <Suspense fallback={null}>
+              <RoutingGraphView />
+            </Suspense>
+          </GraphErrorBoundary>
         </div>
       ) : (
         <MatrixRouting />

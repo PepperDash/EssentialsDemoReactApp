@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import TechToggleButton from '../../shared/TechToggleButton';
 import { resolveCurrentSource } from './currentSource';
-import { buildGraph, tileNumberOf, traceSignalPath } from './graphLayout';
+import { buildGraph, traceSignalPath } from './graphLayout';
 import {
   agePendingRoutes,
   isExpectationMet,
@@ -30,8 +30,10 @@ import RoutingDeviceNode, { PortStatus, RoutingDeviceNodeData } from './RoutingD
 import classes from './RoutingGraphView.module.scss';
 import { MidpointRoute, RoutingPort, SinkRoute } from './routingTypes';
 import { FALLBACK_COLOR } from './signalColors';
-import { atomsOf, flagsContainAll, parseSignalFlags } from './signalTypes';
+import { atomsOf, carriesAtom, flagsContainAll, parseSignalFlags } from './signalTypes';
+import { tileNumberOf } from './tilePorts';
 import TieLineEdge from './TieLineEdge';
+import { useContentStable } from './useContentStable';
 import useRouteCandidates from './useRouteCandidates';
 import { useRoutingGraph } from './useRoutingGraph';
 
@@ -58,7 +60,8 @@ export const RoutingGraphView = () => {
 
   const [routeEdit, setRouteEdit] = useState<{ target: RouteEditTarget; anchorRect: DOMRect } | null>(null);
   const [commandError, setCommandError] = useState<string | null>(null);
-  const [isSending, setIsSending] = useState(false);
+  // The popover target a command is waiting on. Replies only touch the popover that sent them.
+  const [sendingFor, setSendingFor] = useState<RouteEditTarget | null>(null);
   // Commands sent but not yet confirmed by the processor, keyed by device+port.
   const [pendingByPort, setPendingByPort] = useState<Record<string, PendingRoute>>({});
 
@@ -78,6 +81,26 @@ export const RoutingGraphView = () => {
   useEffect(() => {
     midpointRoutesRef.current = midpointRoutes;
   }, [midpointRoutes]);
+
+  const routeEditRef = useRef(routeEdit);
+  useEffect(() => {
+    routeEditRef.current = routeEdit;
+  }, [routeEdit]);
+
+  // The layout only depends on sink routes for the dashed "live-only" edges: routes made with no
+  // tie line behind them (e.g. a dynamic multiview layout). Passing just those means an ordinary
+  // route doesn't re-run dagre, which would snap dragged nodes back and clear the trace.
+  const liveOnlySinkRoutes = useContentStable(
+    useMemo(() => {
+      const wired = new Set(tieLines.map((t) => `${t.destinationDeviceKey}:${t.destinationPortKey}`));
+      const result: Record<string, SinkRoute[]> = {};
+      for (const [deviceKey, routes] of Object.entries(sinkRoutes)) {
+        const liveOnly = routes.filter((r) => !wired.has(`${deviceKey}:${r.inputPortKey}`));
+        if (liveOnly.length > 0) result[deviceKey] = liveOnly;
+      }
+      return result;
+    }, [sinkRoutes, tieLines])
+  );
 
   // ── Route editing ──────────────────────────────────────────────────────────
 
@@ -117,13 +140,18 @@ export const RoutingGraphView = () => {
 
   const handleSubmitRouteCommand = useCallback(
     async (command: RoutingCommand) => {
-      setIsSending(true);
+      const target = routeEditRef.current?.target ?? null;
+      setSendingFor(target);
       const result = await sendCommand(command);
-      setIsSending(false);
+      setSendingFor((current) => (current === target ? null : current));
+      const failed = !result || result.statusCode >= 400;
 
-      if (!result || result.statusCode >= 400) {
+      // A tech who tapped another port meanwhile is now in a different popover; leave it alone.
+      const stillOpen = routeEditRef.current?.target === target;
+
+      if (failed) {
         // Keep the popover open so the tech can pick something else.
-        setCommandError(describeRoutingError(result));
+        if (stillOpen) setCommandError(describeRoutingError(result));
         return;
       }
 
@@ -134,8 +162,10 @@ export const RoutingGraphView = () => {
         setPendingByPort((prev) => ({ ...prev, [pendingId(pending.deviceKey, pending.portKey)]: pending }));
       }
 
-      setRouteEdit(null);
-      setCommandError(null);
+      if (stillOpen) {
+        setRouteEdit(null);
+        setCommandError(null);
+      }
     },
     [sendCommand]
   );
@@ -177,6 +207,12 @@ export const RoutingGraphView = () => {
     return map;
   }, [pendingByPort]);
 
+  // Read by the layout effect, so nodes it rebuilds keep their pending markers and active outline.
+  const portStatusByDeviceRef = useRef(portStatusByDevice);
+  useEffect(() => {
+    portStatusByDeviceRef.current = portStatusByDevice;
+  }, [portStatusByDevice]);
+
   // What is routed to the open popover's port, per signal type, for its check mark.
   const getRouteEditCurrent = useCallback(
     (signalType: string) => {
@@ -190,7 +226,7 @@ export const RoutingGraphView = () => {
             midpointRoutes[target.deviceKey]?.find(
               (r: MidpointRoute) =>
                 r.outputPortKey === target.port.key &&
-                (!r.signalType || flagsContainAll(parseSignalFlags(r.signalType), new Set([atom])))
+                carriesAtom(r.signalType, atom)
             )?.inputPortKey ?? null
         );
         const agreed = inputs.every((key) => key === inputs[0]);
@@ -232,10 +268,11 @@ export const RoutingGraphView = () => {
 
   // ── Graph ──────────────────────────────────────────────────────────────────
 
-  // Re-run dagre only when the graph or the filter changes. React Flow owns the node array between
-  // renders, so dragged positions survive route changes.
+  // Re-run dagre only when the graph, the filter or a live-only edge changes. React Flow owns the
+  // node array between renders, so dragged positions survive route changes.
   useEffect(() => {
     if (!loaded) return;
+    const editing = routeEditRef.current?.target;
     // One toggle hides both unwired devices and unwired ports. Routing is unaffected: a tapped port
     // is resolved against the full device (handlePortClick), so a hidden port is never hidden from
     // the popover's choices.
@@ -245,7 +282,7 @@ export const RoutingGraphView = () => {
       hideUnconnected,
       NO_FILTER,
       hideUnconnected,
-      sinkRoutes
+      liveOnlySinkRoutes
     );
     setNodes(
       layoutNodes.map((n) => {
@@ -259,13 +296,17 @@ export const RoutingGraphView = () => {
               handlePortClick(n.id, port, kind, rect),
             canEditInputs: isRouteDestination(device),
             canEditOutputs: isMidpoint(device),
+            // Carried over so a re-layout doesn't drop them; the status effect below only runs when
+            // they change.
+            portStatus: portStatusByDeviceRef.current.get(n.id) ?? EMPTY_PORT_STATUS,
+            editingPortKey: editing?.deviceKey === n.id ? editing.port.key : null,
           },
         };
       })
     );
     setEdges(layoutEdges);
     setSelectedEdgeIds(new Set());
-  }, [loaded, graphData, hideUnconnected, sinkRoutes, handlePortClick, setNodes, setEdges]);
+  }, [loaded, graphData, hideUnconnected, liveOnlySinkRoutes, handlePortClick, setNodes, setEdges]);
 
   // Keep each node's routes and port status current without re-running dagre.
   useEffect(() => {
@@ -295,8 +336,13 @@ export const RoutingGraphView = () => {
     );
   }, [midpointRoutes, portStatusByDevice, routeEdit, setNodes]);
 
-  // Restyle edges and highlight midpoint routes on the traced path.
+  // Restyle edges and highlight midpoint routes on the traced path. With nothing traced, only a new
+  // selection (including the empty one each re-layout sets) needs a restyle; route changes don't.
+  const styledSelection = useRef<Set<string> | null>(null);
   useEffect(() => {
+    if (selectedEdgeIds.size === 0 && styledSelection.current === selectedEdgeIds) return;
+    styledSelection.current = selectedEdgeIds;
+
     setEdges((eds) =>
       eds.map((e) => {
         const baseColor = (e.data as { signalColor?: string } | undefined)?.signalColor ?? FALLBACK_COLOR;
@@ -430,7 +476,7 @@ export const RoutingGraphView = () => {
           getCurrent={getRouteEditCurrent}
           getCandidateSources={getCandidatesForOpenPopover}
           describeEmptySources={describeEmptySources}
-          isSubmitting={isSending}
+          isSubmitting={sendingFor !== null && sendingFor === routeEdit.target}
           errorMessage={commandError}
           onSubmit={handleSubmitRouteCommand}
           onClose={closeRoutePopover}

@@ -3,6 +3,7 @@ import { Handle, NodeProps, Position } from '@xyflow/react';
 import { MidpointRoute, RoutingDevice, RoutingPort } from './routingTypes';
 import { signalColor } from './signalColors';
 import styles from './RoutingDeviceNode.module.scss';
+import { tileNumberOf } from './tilePorts';
 
 // Adapted from the Dev Tools app's RoutingDeviceNode: Bootstrap classes replaced with this app's
 // tech-page styles, taller rows for touch, and no hide/layout buttons (the demo has no multiview).
@@ -30,12 +31,9 @@ export type RoutingDeviceNodeData = {
   editingPortKey?: string | null;
 };
 
-/** Multiview tile ports arrive qualified as "tile{N}:{portKey}" - see RoutingGraphHelpers. */
-const TILE_PORT_RE = /^tile(\d+):/;
-
 function portDisplayLabel(portKey: string): string {
-  const match = TILE_PORT_RE.exec(portKey);
-  return match ? `Tile ${match[1]}` : portKey;
+  const tileNumber = tileNumberOf(portKey);
+  return tileNumber !== undefined ? `Tile ${tileNumber}` : portKey;
 }
 
 interface PortCellProps {

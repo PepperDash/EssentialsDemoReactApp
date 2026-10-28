@@ -124,8 +124,15 @@ function portSupportsSignalType(
   );
 }
 
+/** True when a wire or route reporting `have` carries `atom`. An unreported type is not a veto. */
+function carriesAtom(have: string | null | undefined, atom: string): boolean {
+  if (!have) return true;
+  return flagsContainAll(parseSignalFlags(have), new Set([atom]));
+}
+
 export {
   atomsOf,
+  carriesAtom,
   flagsContainAll,
   flagsIntersect,
   formatSignalFlags,

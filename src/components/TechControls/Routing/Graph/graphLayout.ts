@@ -1,5 +1,5 @@
 // Graph layout and path tracing, copied from the Dev Tools app's Routing.tsx (buildGraph,
-// traceSignalPath, tileNumberOf). Pure functions: data in, React Flow nodes and edges out.
+// traceSignalPath). Pure functions: data in, React Flow nodes and edges out.
 import { Edge, Node } from '@xyflow/react';
 import dagre from 'dagre';
 
@@ -345,10 +345,3 @@ export function traceSignalPath(
   return result;
 }
 
-/** Multiview tile ports arrive qualified as "tile{N}:{portKey}". */
-const TILE_PORT_RE = /^tile(\d+):/;
-
-export function tileNumberOf(portKey: string): number | undefined {
-  const match = TILE_PORT_RE.exec(portKey);
-  return match ? Number(match[1]) : undefined;
-}

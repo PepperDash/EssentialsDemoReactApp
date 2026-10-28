@@ -10,12 +10,8 @@
 
 import { MidpointRoute, SinkRoute } from './routingTypes';
 import { RoutingCommand } from './routingCommands';
-import {
-  atomsOf,
-  flagsContainAll,
-  flagsIntersect,
-  parseSignalFlags,
-} from './signalTypes';
+import { portId } from './routeGraph';
+import { atomsOf, carriesAtom, flagsIntersect, parseSignalFlags } from './signalTypes';
 
 export interface PendingRoute {
   deviceKey: string;
@@ -39,10 +35,8 @@ export const PENDING_TIMEOUT_MS = 10_000;
 /** How long the warning stays on the port before clearing itself. */
 export const PENDING_CLEANUP_MS = 5_000;
 
-/** NUL cannot appear in a device or port key, so it cannot collide with key content. */
-export function pendingId(deviceKey: string, portKey: string): string {
-  return `${deviceKey}\u0000${portKey}`;
-}
+/** Pending routes are keyed by port, the same way the route index keys ports. */
+export const pendingId = portId;
 
 /**
  * Derives what to watch for from the command that was sent, or null when the command names no
@@ -72,11 +66,6 @@ export function pendingFromCommand(
   };
 }
 
-/** True when a route reporting `have` carries `atom`. An unreported type is not a veto. */
-function carriesAtom(have: string | null | undefined, atom: string): boolean {
-  if (!have) return true;
-  return flagsContainAll(parseSignalFlags(have), new Set([atom]));
-}
 
 /**
  * Has sink feedback caught up with what was asked for? A route expects the port to report the

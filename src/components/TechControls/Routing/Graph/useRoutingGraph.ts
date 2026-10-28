@@ -1,16 +1,17 @@
-import { useGetDevice, useWebsocketContext } from '@pepperdash/mobile-control-react-app-core';
+import { useGetDevice, useWebsocketContext, useWsIsConnected } from '@pepperdash/mobile-control-react-app-core';
 import type { DeviceState } from '@pepperdash/mobile-control-react-app-core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ROUTING_COMMAND_PATH, RoutingCommand, RoutingCommandResult } from './routingCommands';
 import { MidpointRoute, RoutingDevice, RoutingGraphState, SinkRoute, TieLine } from './routingTypes';
+import { useContentStable } from './useContentStable';
 
 const MESSAGE_PATH = '/device/routingGraph';
 const DEVICE_KEY = 'routingGraph';
 const COMMAND_RESULT_EVENT = '/event/device/routingGraph/commandResult';
 const HANDLER_KEY = 'routingGraphView';
 
-/** How long to wait for the graph before deciding the processor has no routing graph messenger. */
+/** How long to wait, once connected, before deciding the processor has no routing graph messenger. */
 const UNSUPPORTED_AFTER_MS = 5000;
 /** How long to wait for a command's reply. */
 const COMMAND_TIMEOUT_MS = 10000;
@@ -24,6 +25,11 @@ const NO_SINK_ROUTES: Record<string, SinkRoute[]> = {};
 let nextRequestId = 0;
 const newRequestId = () => `${Date.now().toString(36)}-${(nextRequestId++).toString(36)}`;
 
+interface PendingCommand {
+  resolve: (result: RoutingCommandResult | undefined) => void;
+  timer: ReturnType<typeof setTimeout>;
+}
+
 export interface RoutingGraph {
   devices: RoutingDevice[];
   tieLines: TieLine[];
@@ -33,7 +39,10 @@ export interface RoutingGraph {
   loaded: boolean;
   /** No graph arrived in time: the processor's Essentials has no routing graph messenger. */
   unsupported: boolean;
-  /** Sends a routing command; resolves with its reply, or undefined if none came back in time. */
+  /**
+   * Sends a routing command; resolves with its reply, or undefined if none came back in time.
+   * Never resolves if the view unmounts first.
+   */
   sendCommand: (command: RoutingCommand) => Promise<RoutingCommandResult | undefined>;
 }
 
@@ -41,43 +50,58 @@ export interface RoutingGraph {
  * The system's routing graph and live routes, from Essentials' RoutingGraphMessenger over Mobile
  * Control. This stands in for the Dev Tools app's web API calls and routing feedback socket: the
  * messenger sends the same shapes and runs the same routing commands.
+ *
+ * Each value keeps its identity until its contents change (see useContentStable), so the graph is
+ * laid out again only when the wiring changes, not on every route.
  */
 export function useRoutingGraph(): RoutingGraph {
   const { sendMessage, addEventHandler, removeEventHandler } = useWebsocketContext();
+  const connected = Boolean(useWsIsConnected());
   const state = useGetDevice<RoutingGraphState & DeviceState>(DEVICE_KEY);
+
+  const devices = useContentStable(state?.devices ?? NO_DEVICES);
+  const tieLines = useContentStable(state?.tieLines ?? NO_TIE_LINES);
+  const midpointRoutes = useContentStable(state?.midpointRoutes ?? NO_MIDPOINT_ROUTES);
+  const sinkRoutes = useContentStable(state?.sinkRoutes ?? NO_SINK_ROUTES);
+
   const loaded = Boolean(state?.devices);
   const [unsupported, setUnsupported] = useState(false);
 
   // Replies are matched to their commands by requestId.
-  const waiting = useRef(new Map<string, (result: RoutingCommandResult | undefined) => void>());
+  const pending = useRef(new Map<string, PendingCommand>());
 
+  // Ask on every connect: a request sent while disconnected is dropped, and a reconnect may come
+  // back to a processor that has restarted.
   useEffect(() => {
-    sendMessage(`${MESSAGE_PATH}/fullStatus`, {});
-  }, [sendMessage]);
+    if (connected) sendMessage(`${MESSAGE_PATH}/fullStatus`, {});
+  }, [connected, sendMessage]);
 
+  // Only count the wait while connected, so a slow connection doesn't read as "not supported".
   useEffect(() => {
-    if (loaded) {
+    if (loaded || !connected) {
       setUnsupported(false);
       return;
     }
     const timer = setTimeout(() => setUnsupported(true), UNSUPPORTED_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [loaded]);
+  }, [loaded, connected]);
 
   useEffect(() => {
-    const pending = waiting.current;
+    const waiting = pending.current;
     addEventHandler(COMMAND_RESULT_EVENT, HANDLER_KEY, (message) => {
       const result = message.content as RoutingCommandResult | undefined;
-      const resolve = result?.requestId ? pending.get(result.requestId) : undefined;
-      if (!resolve) return;
-      pending.delete(result!.requestId);
-      resolve(result);
+      const command = result?.requestId ? waiting.get(result.requestId) : undefined;
+      if (!command) return;
+      clearTimeout(command.timer);
+      waiting.delete(result!.requestId);
+      command.resolve(result);
     });
 
     return () => {
       removeEventHandler(COMMAND_RESULT_EVENT, HANDLER_KEY);
-      pending.forEach((resolve) => resolve(undefined));
-      pending.clear();
+      // Drop, don't resolve: the view that sent these is gone and has nothing left to update.
+      waiting.forEach((command) => clearTimeout(command.timer));
+      waiting.clear();
     };
   }, [addEventHandler, removeEventHandler]);
 
@@ -85,29 +109,19 @@ export function useRoutingGraph(): RoutingGraph {
     (command: RoutingCommand) =>
       new Promise<RoutingCommandResult | undefined>((resolve) => {
         const requestId = newRequestId();
-        const pending = waiting.current;
-        pending.set(requestId, resolve);
-        sendMessage(`${MESSAGE_PATH}/${ROUTING_COMMAND_PATH}`, { ...command, requestId });
-
-        setTimeout(() => {
-          if (!pending.has(requestId)) return;
-          pending.delete(requestId);
+        const waiting = pending.current;
+        const timer = setTimeout(() => {
+          if (!waiting.delete(requestId)) return;
           resolve(undefined);
         }, COMMAND_TIMEOUT_MS);
+        waiting.set(requestId, { resolve, timer });
+        sendMessage(`${MESSAGE_PATH}/${ROUTING_COMMAND_PATH}`, { ...command, requestId });
       }),
     [sendMessage]
   );
 
   return useMemo(
-    () => ({
-      devices: state?.devices ?? NO_DEVICES,
-      tieLines: state?.tieLines ?? NO_TIE_LINES,
-      midpointRoutes: state?.midpointRoutes ?? NO_MIDPOINT_ROUTES,
-      sinkRoutes: state?.sinkRoutes ?? NO_SINK_ROUTES,
-      loaded,
-      unsupported,
-      sendCommand,
-    }),
-    [state?.devices, state?.tieLines, state?.midpointRoutes, state?.sinkRoutes, loaded, unsupported, sendCommand]
+    () => ({ devices, tieLines, midpointRoutes, sinkRoutes, loaded, unsupported, sendCommand }),
+    [devices, tieLines, midpointRoutes, sinkRoutes, loaded, unsupported, sendCommand]
   );
 }

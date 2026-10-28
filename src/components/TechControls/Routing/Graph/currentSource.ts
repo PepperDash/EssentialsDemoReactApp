@@ -21,7 +21,7 @@
 
 import { MidpointRoute } from './routingTypes';
 import { portId, RouteIndex } from './routeGraph';
-import { atomsOf, flagsContainAll, parseSignalFlags } from './signalTypes';
+import { atomsOf, carriesAtom as carries } from './signalTypes';
 
 export type CurrentSourceResolution =
   /** Traced all the way to an originating device. */
@@ -35,12 +35,6 @@ export type CurrentSourceResolution =
    * such as Audio and Video switched from different inputs. No single source is "current".
    */
   | { status: 'split' };
-
-/** True when a wire or route reporting `have` carries `atom`. An unreported type is not a veto. */
-function carries(have: string | null | undefined, atom: string): boolean {
-  if (!have) return true;
-  return flagsContainAll(parseSignalFlags(have), new Set([atom]));
-}
 
 /**
  * Traces backwards from a destination port to whatever is feeding it, following live midpoint
