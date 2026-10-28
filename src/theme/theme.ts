@@ -110,8 +110,26 @@ const BLACK: Rgb = [0, 0, 0];
 const triplet = (rgb: Rgb) => rgb.join(', ');
 const hex = (rgb: Rgb) => `#${rgb.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
 
-// Rough perceived brightness, 0-1: decides dark or white text on an accent-filled control.
-const brightness = ([r, g, b]: Rgb) => (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+// WCAG relative luminance and contrast ratio.
+const luminance = (rgb: Rgb) => {
+  const [r, g, b] = rgb.map((c) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+const contrast = (a: Rgb, b: Rgb) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+
+/** White or a deep shade of the accent, whichever reads better on every one of `backgrounds`. */
+const foregroundFor = (accentRgb: Rgb, backgrounds: Rgb[]) => {
+  const candidates = [WHITE, mix(accentRgb, BLACK, 0.85)];
+  const worst = (fg: Rgb) => Math.min(...backgrounds.map((bg) => contrast(fg, bg)));
+  return hex(worst(candidates[0]) >= worst(candidates[1]) ? candidates[0] : candidates[1]);
+};
 
 const ACCENT_PROPS = [
   '--pd-accent',
@@ -136,18 +154,24 @@ const applyAccent = () => {
   const rgb = toRgb(accent);
   style.setProperty('--pd-accent', accent);
   style.setProperty('--pd-focus', accent);
-  if (!isMidnight) return; // The original theme only uses the flat accent.
+  if (!isMidnight) {
+    // The original theme only uses the flat accent, plus readable text on it.
+    style.setProperty('--pd-on-active', foregroundFor(rgb, [rgb]));
+    return;
+  }
 
   // Midnight builds its gradients, glows and highlight from tints and shades of the accent.
   style.setProperty('--pd-pill', accent);
   style.setProperty('--pd-accent-light', hex(mix(rgb, WHITE, 0.5)));
   style.setProperty('--pd-accent-dark', hex(mix(rgb, BLACK, 0.18)));
-  style.setProperty('--pd-active-bg', `linear-gradient(180deg, ${hex(mix(rgb, WHITE, 0.2))}, ${hex(mix(rgb, BLACK, 0.08))})`);
+  const activeTop = mix(rgb, WHITE, 0.2);
+  const activeBottom = mix(rgb, BLACK, 0.08);
+  style.setProperty('--pd-active-bg', `linear-gradient(180deg, ${hex(activeTop)}, ${hex(activeBottom)})`);
   style.setProperty('--pd-active-border', `rgba(${triplet(mix(rgb, WHITE, 0.45))}, 0.8)`);
   style.setProperty('--pd-glow', triplet(mix(rgb, WHITE, 0.2)));
   style.setProperty('--pd-glow-deep', triplet(mix(rgb, BLACK, 0.05)));
   style.setProperty('--pd-glow-soft', triplet(mix(rgb, WHITE, 0.6)));
-  style.setProperty('--pd-on-active', brightness(rgb) > 0.55 ? hex(mix(rgb, BLACK, 0.85)) : '#fff');
+  style.setProperty('--pd-on-active', foregroundFor(rgb, [activeTop, rgb, activeBottom]));
   // Light mode needs a darker shade to read on its pale bands.
   style.setProperty('--pd-highlight', hex(getColorMode() === 'light' ? mix(rgb, BLACK, 0.3) : mix(rgb, WHITE, 0.15)));
 };

@@ -30,7 +30,7 @@
 
   &.active {
     background-color: var(--pd-accent);
-    // Midnight's dark text on its amber accent; the original theme has no --pd-on-active and keeps white.
+    // Readable text on the accent (see theme.ts); the original theme's own blue has no --pd-on-active and keeps white.
     color: var(--pd-on-active, var(--pd-text-inverse));
   }
 }

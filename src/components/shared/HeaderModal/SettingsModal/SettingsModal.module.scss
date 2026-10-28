@@ -52,6 +52,8 @@
 
   &.active {
     background-color: var(--pd-accent);
+    // Set with a picked accent (theme.ts); the original theme's own blue keeps white.
+    color: var(--pd-on-active, var(--pd-text-inverse));
   }
 }
 

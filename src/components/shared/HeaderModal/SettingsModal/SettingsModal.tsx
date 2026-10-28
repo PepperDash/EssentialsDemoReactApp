@@ -34,7 +34,14 @@ export const SettingsModal = () => {
   const isCustom = accent !== null && !ACCENTS.includes(accent);
 
   return (
-    <div className={classes.wrapper}>
+    // Enter and Space activate the controls here; stop them reaching HeaderModalOverlay, which
+    // closes the modal on either. Escape still gets through.
+    <div
+      className={classes.wrapper}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') event.stopPropagation();
+      }}
+    >
       <span className={classes.title}>Settings</span>
 
       <div className={classes.row}>

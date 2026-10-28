@@ -73,9 +73,10 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
   const roomName = useRoomName(roomKey);
   const { time } = useTimeAndDate();
   const { activeModal, openModal, closeModal } = useHeaderModal();
-  // Midnight: tapping the button for the modal that's already open closes it.
+  // Tapping the button for the modal that's already open closes it: always for Settings, and for
+  // every modal in Midnight.
   const toggleModal = (modal: HeaderModalId) =>
-    isMidnight && activeModal === modal ? closeModal() : openModal(modal);
+    activeModal === modal && (isMidnight || modal === 'settings') ? closeModal() : openModal(modal);
   const buttonClass = (modal: HeaderModalId) =>
     `${classes.iconButton} ${activeModal === modal ? classes.active : ''}`;
   const navigate = useNavigate();
