@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export type HeaderModalId = 'lighting' | 'help' | 'audio';
+export type HeaderModalId = 'lighting' | 'help' | 'audio' | 'settings';
 
 export interface HeaderModalContextValue {
   activeModal: HeaderModalId | null;

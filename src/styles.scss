@@ -43,6 +43,31 @@ $noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   --pd-page-bg: var(--pd-surface);
 }
 
+// The original theme's dark mode, switched in the Settings modal (data-mode="dark" on <html>, see
+// theme/theme.ts). Same layout and gray-on-gray look, inverted: charcoal surfaces, white text, and
+// the black <img> icons and logo flipped to white. The tech pages are already dark and stay as-is.
+:root[data-mode='dark']:not([data-theme='midnight']) {
+  color-scheme: dark;
+  --pd-surface: #1d2022;
+  --pd-text: #f2f4f5;
+  --pd-bar: #2c3133;
+  --pd-accent: #2f7fc4;
+  --pd-neutral: #3a4042;
+  --pd-neutral-alt: #4a5254;
+  --pd-card: #2b2f30;
+  --pd-pill: #4a5052;
+  --pd-on-pill: #f2f4f5;
+  --pd-knob: #e9ecee;
+  --pd-border: #5c6466;
+  --pd-divider: #3a4042;
+  --pd-keypad-light: #5c6466;
+  --pd-icon-filter: invert(1) hue-rotate(180deg); // Black icons to white; colored ones keep their hue.
+  --pd-logo-filter: brightness(0) invert(1);
+  --pd-company-logo-filter: brightness(0) invert(1);
+  --bs-body-color: #f2f4f5;
+  --bs-body-bg: #1d2022;
+}
+
 // Midnight: deep navy surfaces with an amber accent. The <img> icons and logo can't take a CSS color,
 // so they're flattened to white with a filter to stay visible on the dark bars.
 [data-theme='midnight'] {
@@ -95,12 +120,15 @@ $noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   --pd-active-bg: linear-gradient(180deg, #ffc247, #ee950a);
   --pd-active-border: rgba(255, 214, 140, 0.8);
   --pd-active-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 12px 18px -8px rgba(var(--pd-glow-deep), 0.95),
-    inset 0 -3px 8px rgba(255, 226, 160, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    inset 0 -3px 8px rgba(var(--pd-glow-soft), 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   --pd-band-bg: rgba(255, 255, 255, 0.04);
   // Accent glows, as RGB triplets for rgba(): --pd-glow for bright halos, --pd-glow-deep for the
   // soft shadows under active controls.
   --pd-glow: 255, 192, 77;
   --pd-glow-deep: 245, 150, 10;
+  --pd-glow-soft: 255, 226, 160; // Pale inner glow along an active control's bottom edge.
+  --pd-accent-light: #ffdc8f; // Ends of the accent gradients (fader fill, shutdown progress).
+  --pd-accent-dark: #d47800;
   --pd-on-active: #2a1a00; // Text and icons on an accent-filled control.
   --pd-highlight: #ffc04d; // Selected source and activity: text, icon and underline.
   --pd-source-band-bg: rgba(14, 25, 45, 0.92);
@@ -138,7 +166,7 @@ $noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   --pd-glass-shadow: 0 8px 20px rgba(30, 55, 100, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --pd-panel-bg: rgba(255, 255, 255, 0.6);
   --pd-active-shadow: 0 8px 20px rgba(30, 55, 100, 0.18), 0 12px 18px -8px rgba(var(--pd-glow-deep), 0.8),
-    inset 0 -3px 8px rgba(255, 226, 160, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    inset 0 -3px 8px rgba(var(--pd-glow-soft), 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 
   --pd-highlight: #b86e00; // Darker than dark mode's so it reads on a pale band.
   --pd-source-band-bg: rgba(255, 255, 255, 0.62);

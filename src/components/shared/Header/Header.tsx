@@ -12,9 +12,11 @@ import type { HeaderModalId } from '../../../context/HeaderModalContext';
 import classicLightingIconUrl from '../../../assets/icons/lighting.svg';
 import classicHelpIconUrl from '../../../assets/icons/help.svg';
 import classicAudioControlsIconUrl from '../../../assets/icons/audio-controls.svg';
+import classicSettingsIconUrl from '../../../assets/icons/settings.svg';
 import midnightLightingIconUrl from '../../../assets/icons/midnight/lighting.svg';
 import midnightHelpIconUrl from '../../../assets/icons/midnight/help.svg';
 import midnightAudioControlsIconUrl from '../../../assets/icons/midnight/audio-controls.svg';
+import midnightSettingsIconUrl from '../../../assets/icons/midnight/settings.svg';
 import { isMidnight } from '../../../theme/theme';
 import companyLogoUrl from '../../../assets/branding/acme-logo.svg';
 import classes from './Header.module.scss';
@@ -22,6 +24,7 @@ import classes from './Header.module.scss';
 const lightingIconUrl = isMidnight ? midnightLightingIconUrl : classicLightingIconUrl;
 const helpIconUrl = isMidnight ? midnightHelpIconUrl : classicHelpIconUrl;
 const audioControlsIconUrl = isMidnight ? midnightAudioControlsIconUrl : classicAudioControlsIconUrl;
+const settingsIconUrl = isMidnight ? midnightSettingsIconUrl : classicSettingsIconUrl;
 
 // The core library's own <Clock /> component has a stray "new change" string left in its render
 // output (a debug leftover) - useTimeAndDate() is the same underlying hook without that bug, so
@@ -39,6 +42,10 @@ const AudioControlsIcon = ({ className }: IconProps) => (
   <img src={audioControlsIconUrl} alt="" className={className} />
 );
 
+const SettingsIcon = ({ className }: IconProps) => (
+  <img src={settingsIconUrl} alt="" className={className} />
+);
+
 const TECH_PIN_HOLD_MS = 3000;
 
 interface HeaderProps {
@@ -53,7 +60,7 @@ interface HeaderProps {
 
 /**
  * Common header rendered at the top of every user-facing page: room name, live clock, and quick
- * access to lighting, help, and audio controls.
+ * access to lighting, help, audio controls, and settings (theme and light/dark mode).
  *
  * Lighting and help open a `HeaderModalOverlay` panel - a dimmed overlay above whatever page is
  * currently showing, not a route, since the same icon has to work identically from every page
@@ -111,6 +118,13 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
           iconClassName={classes.icon}
           aria-label="Audio controls (hold 3 seconds for tech access)"
           {...audioControlsPress}
+        />
+        <IconButton
+          multiIcon={SettingsIcon}
+          className={buttonClass('settings')}
+          iconClassName={classes.icon}
+          aria-label="Settings"
+          onClick={() => toggleModal('settings')}
         />
       </div>
     </header>

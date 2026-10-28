@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getMidnightMode, setMidnightMode } from '../../../theme/theme';
+import { getColorMode, setColorMode } from '../../../theme/theme';
 import classes from './ThemeToggle.module.scss';
 
 const iconProps = {
@@ -26,35 +26,32 @@ const MoonIcon = ({ className }: { className?: string }) => (
 );
 
 /**
- * Midnight's light/dark switch. On is the light mode (sun showing); off is the original dark
- * Midnight (moon showing). Only rendered in the Midnight theme.
+ * Light/dark switch in the Settings modal, for whichever theme is active. On is light mode (sun
+ * showing); off is dark mode (moon showing).
  */
 export const ThemeToggle = () => {
-  const [light, setLight] = useState(getMidnightMode() === 'light');
+  const [light, setLight] = useState(getColorMode() === 'light');
 
   const toggle = () => {
-    setMidnightMode(light ? 'dark' : 'light');
+    setColorMode(light ? 'dark' : 'light');
     setLight(!light);
   };
 
   return (
-    <div className={classes.wrapper}>
-      <span className={classes.caption}>Theme</span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={light}
-        aria-label="Light theme" // Fixed name; aria-checked says whether light mode is on.
-        className={`${classes.track} ${light ? classes.on : ''}`}
-        onClick={toggle}
-      >
-        {/* Both icons sit in the track; the knob slides over whichever mode isn't active, leaving
-            the current mode's icon showing in the empty half. */}
-        <SunIcon className={`${classes.icon} ${classes.sun}`} />
-        <MoonIcon className={`${classes.icon} ${classes.moon}`} />
-        <span className={classes.knob} />
-      </button>
-    </div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={light}
+      aria-label="Light mode" // Fixed name; aria-checked says whether light mode is on.
+      className={`${classes.track} ${light ? classes.on : ''}`}
+      onClick={toggle}
+    >
+      {/* Both icons sit in the track; the knob slides over whichever mode isn't active, leaving
+          the current mode's icon showing in the empty half. */}
+      <SunIcon className={`${classes.icon} ${classes.sun}`} />
+      <MoonIcon className={`${classes.icon} ${classes.moon}`} />
+      <span className={classes.knob} />
+    </button>
   );
 };
 

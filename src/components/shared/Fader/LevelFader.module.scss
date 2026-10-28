@@ -123,6 +123,7 @@ $muted-color: var(--pd-danger); // colors/semantic/button-danger
   justify-content: center;
   width: 55px;
   height: 55px;
+  gap: 0; // IconButton adds an empty element after the icon; its 8px gap pushed the icon off center.
   color: var(--pd-text);
 
   .dark & {
@@ -160,7 +161,7 @@ $muted-color: var(--pd-danger); // colors/semantic/button-danger
 
 .fill {
   @include midnight {
-    background: linear-gradient(0deg, #d47800 0%, #ffb020 55%, #ffdc8f 100%);
+    background: linear-gradient(0deg, var(--pd-accent-dark) 0%, var(--pd-accent) 55%, var(--pd-accent-light) 100%);
     box-shadow: 0 0 12px rgba(var(--pd-glow-deep), 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5);
     border-radius: 9px;
   }

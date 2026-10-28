@@ -3,7 +3,6 @@ import type { IconProps } from '@pepperdash/mobile-control-react-app-core';
 import classicSharingIconUrl from '../../../assets/icons/activity-sharing.svg';
 import classicEndSessionIconUrl from '../../../assets/icons/activity-end-session.svg';
 import { isMidnight } from '../../../theme/theme';
-import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import classes from './ActivityFooter.module.scss';
 
 // Midnight draws thin outlined icons inline, so they follow the button's CSS `color` (blue when
@@ -83,12 +82,6 @@ export const ActivityFooter = () => {
           </>
         }
       />
-
-      {isMidnight && (
-        <div className={classes.themeToggle}>
-          <ThemeToggle />
-        </div>
-      )}
     </div>
   );
 };
