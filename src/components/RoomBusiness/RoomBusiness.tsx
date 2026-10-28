@@ -12,7 +12,6 @@ import PageFade from './PageFade/PageFade';
 import { isMidnight } from '../../theme/theme';
 import HeaderModalOutlet from '../shared/HeaderModal/HeaderModalOutlet';
 import ShutdownPrompt from '../shared/ShutdownPrompt/ShutdownPrompt';
-import TechPinPage from '../TechControls/TechPin/TechPinPage';
 import TechLayout from '../TechControls/TechLayout/TechLayout';
 import SystemStatusPage from '../TechControls/SystemStatus/SystemStatusPage';
 import DisplaysPage from '../TechControls/Displays/DisplaysPage';
@@ -63,9 +62,9 @@ const RoomBusiness = () => {
       <div className={classes.wrapper}>
         <Routes>
           {/* The room-off splash screen is only ever the "/" view, not a route of its own - held
-              behind isOn rather than living under its own path. /techPin (held from the header's
-              settings icon) and the tech pages behind it need to work whether or not the room is on,
-              so they're routes here regardless of isOn, unlike the splash/home split. */}
+              behind isOn rather than living under its own path. The tech pages (opened from the
+              Settings modal) need to work whether or not the room is on, so they're routes here
+              regardless of isOn, unlike the splash/home split. */}
           <Route
             path="/"
             element={
@@ -79,7 +78,6 @@ const RoomBusiness = () => {
               )
             }
           />
-          <Route path="/techPin" element={<TechPinPage />} />
 
           {/* All five tech sections are built. */}
           <Route path="/tech" element={<TechLayout />}>

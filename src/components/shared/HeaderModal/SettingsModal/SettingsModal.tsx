@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useHeaderModal } from '../../../../hooks/useHeaderModal';
 import { chooseTheme, getAccentColor, isMidnight, setAccentColor, ThemeName } from '../../../../theme/theme';
 import ThemeToggle from '../../ThemeToggle/ThemeToggle';
 import classes from './SettingsModal.module.scss';
@@ -17,12 +19,16 @@ const DEFAULT_ACCENT = isMidnight ? '#ffb020' : '#005294';
 const ACCENTS = [DEFAULT_ACCENT, '#2cc4d6', '#a97bf5', '#3fcf8e'];
 
 /**
- * Settings panel, opened from the header's gear icon: the theme picker, the accent color and the
- * light/dark switch. Picking the other theme reloads the page into it (see chooseTheme in
- * theme.ts); the accent and light/dark mode apply immediately.
+ * Settings panel, opened from the header's gear icon: the theme picker, the accent color, the
+ * light/dark switch, and the way into the technician pages. Picking the other theme reloads the
+ * page into it (see chooseTheme in theme.ts); the accent and light/dark mode apply immediately.
+ *
+ * This is a demo system, so the technician pages open straight from here, with no PIN.
  */
 export const SettingsModal = () => {
   const currentTheme: ThemeName = isMidnight ? 'midnight' : 'classic';
+  const navigate = useNavigate();
+  const { closeModal } = useHeaderModal();
   const [accent, setAccent] = useState(getAccentColor());
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -118,6 +124,18 @@ export const SettingsModal = () => {
         <span className={classes.caption}>Light Mode</span>
         <ThemeToggle />
       </div>
+
+      <button
+        type="button"
+        className={classes.techButton}
+        onClick={() => {
+          // The header modals overlay every route, so close this one or it would cover the tech pages.
+          closeModal();
+          navigate('/tech');
+        }}
+      >
+        Technician Controls
+      </button>
     </div>
   );
 };

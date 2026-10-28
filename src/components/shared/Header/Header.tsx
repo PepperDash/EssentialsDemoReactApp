@@ -1,12 +1,10 @@
 import {
   IconButton,
-  usePressHoldRelease,
   useRoomKey,
   useRoomName,
   useTimeAndDate,
 } from '@pepperdash/mobile-control-react-app-core';
 import type { IconProps } from '@pepperdash/mobile-control-react-app-core';
-import { useNavigate } from 'react-router-dom';
 import { useHeaderModal } from '../../../hooks/useHeaderModal';
 import type { HeaderModalId } from '../../../context/HeaderModalContext';
 import classicLightingIconUrl from '../../../assets/icons/lighting.svg';
@@ -46,8 +44,6 @@ const SettingsIcon = ({ className }: IconProps) => (
   <img src={settingsIconUrl} alt="" className={className} />
 );
 
-const TECH_PIN_HOLD_MS = 3000;
-
 interface HeaderProps {
   /** Override the lighting icon's default action. */
   onLightingPress?: () => void;
@@ -59,13 +55,12 @@ interface HeaderProps {
 
 /**
  * Common header rendered at the top of every user-facing page: room name, live clock, and quick
- * access to lighting, help, audio controls, and settings (theme and light/dark mode).
+ * access to lighting, help, audio controls, and settings (theme, light/dark mode and the way into
+ * the technician pages).
  *
- * Lighting, help and audio controls open a `HeaderModalOverlay` panel - a dimmed overlay above
- * whatever page is currently showing, not a route, since the same icon has to work identically from
- * every page regardless of what's underneath it. The settings icon is overloaded: a short press
- * opens its modal the same way, but holding it for 3 seconds instead routes to the PIN-gated tech
- * pages.
+ * Each icon opens a `HeaderModalOverlay` panel - a dimmed overlay above whatever page is currently
+ * showing, not a route, since the same icon has to work identically from every page regardless of
+ * what's underneath it.
  */
 export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderProps) => {
   const roomKey = useRoomKey();
@@ -78,17 +73,6 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
     activeModal === modal && (isMidnight || modal === 'settings') ? closeModal() : openModal(modal);
   const buttonClass = (modal: HeaderModalId) =>
     `${classes.iconButton} ${activeModal === modal ? classes.active : ''}`;
-  const navigate = useNavigate();
-
-  const settingsPress = usePressHoldRelease({
-    onPressedButNotHeld: () => toggleModal('settings'),
-    // Header modals overlay every route, so close any open one or it would cover the PIN page.
-    onHold: () => {
-      closeModal();
-      navigate('/techPin');
-    },
-    holdTimeMs: TECH_PIN_HOLD_MS,
-  });
 
   return (
     <header className={classes.header}>
@@ -127,8 +111,8 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
           multiIcon={SettingsIcon}
           className={buttonClass('settings')}
           iconClassName={classes.icon}
-          aria-label="Settings (hold 3 seconds for tech access)"
-          {...settingsPress}
+          aria-label="Settings"
+          onClick={() => toggleModal('settings')}
         />
       </div>
     </header>
