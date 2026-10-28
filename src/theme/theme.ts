@@ -1,111 +1,114 @@
 // Which UI theme this panel uses comes from the panel's own config ("theme": "midnight" on its
 // mcxpanel/mctsw device); anything else keeps the original UI. The config only arrives after the
 // websocket connects, but parts of Midnight are chosen once at page load (icon sets, the sources
-// band, lighting behavior). So the last theme the config asked for is remembered in localStorage
-// and applied here, before anything renders - and PanelThemeSync reloads once if the config asks
-// for a different one. A theme picked in the Settings modal overrides the config.
+// band, lighting behavior). So the last theme the config asked for is remembered and applied here,
+// before anything renders - and PanelThemeSync reloads once if the config asks for a different one.
+// A theme picked in the Settings modal overrides the config.
 //
-// All stored preferences (the themes and the light/dark mode below) are keyed per panel, so panels
-// opened in the same browser don't share them. The panel's Mobile Control token is the only
-// identity available before the websocket connects: in the query on first load, then in the
-// session path (/mc/app/<token>/<roomKey>/).
-//
-// Where storage is unavailable, the theme travels in the page URL instead (see reloadInto). A
-// TSW panel needs this: its wrapper app shows this UI in an iframe from the processor, a different
-// origin, and the panel's browser blocks storage for it. There, a theme picked in Settings lasts
-// until the wrapper reloads the UI (e.g. a panel reboot), which then shows the configured theme.
+// All preferences (the themes, light/dark mode and accent color below) are kept per panel, so panels
+// opened in the same browser don't share them, in localStorage or, where storage is blocked (a TSW),
+// in the page URL - see panelPrefs.ts. The panel's Mobile Control token is the only identity
+// available before the websocket connects: in the query on first load, then in the session path
+// (/mc/app/<token>/<roomKey>/).
+import { createPanelPrefs, PanelPref } from './panelPrefs';
+
+export type ThemeName = 'classic' | 'midnight';
+export type ColorMode = 'dark' | 'light';
+
+const isThemeName = (value: string): value is ThemeName => value === 'classic' || value === 'midnight';
+const isColorMode = (value: string): value is ColorMode => value === 'dark' || value === 'light';
+const isHexColor = (value: string) => /^#[0-9a-f]{6}$/i.test(value);
+
+const startupToken = new URLSearchParams(location.search).get('token');
 const pathSegments = location.pathname.split('/').filter(Boolean);
-const panelId =
-  new URLSearchParams(location.search).get('token') ??
+/** Identifies this panel for its stored preferences (see above). */
+export const panelId =
+  startupToken ??
   (pathSegments.length >= 4 ? pathSegments[2] : undefined) ?? // only a full session path carries the token
   'default';
-const THEME_KEY = `pd-panel-theme:${panelId}`;
 
-const urlParams = new URLSearchParams(location.search);
-const URL_THEME_PARAM = 'theme';
-const URL_CHOICE_PARAM = 'themeChoice';
+// The theme the config last asked for, and a theme picked in Settings (which overrides the config
+// and the dev override below, so a user's choice sticks on this panel until they pick again).
+const CONFIGURED_THEME: PanelPref = { key: `pd-panel-theme:${panelId}`, param: 'pdTheme', isValid: isThemeName };
+const CHOSEN_THEME: PanelPref = { key: `pd-panel-theme-choice:${panelId}`, param: 'pdThemeChoice', isValid: isThemeName };
 
-// Read from localStorage; storage can be unavailable (private mode, locked-down browsers), so every
-// access is guarded and the panel falls back to its defaults.
-const readStored = (key: string) => {
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-};
+// Each theme remembers its own light/dark mode and accent color.
+const modePref = (theme: ThemeName): PanelPref => ({
+  key: `pd-${theme}-mode:${panelId}`,
+  param: theme === 'midnight' ? 'pdMidnightMode' : 'pdClassicMode',
+  isValid: isColorMode,
+});
+const accentPref = (theme: ThemeName): PanelPref => ({
+  key: `pd-${theme}-accent:${panelId}`,
+  param: theme === 'midnight' ? 'pdMidnightAccent' : 'pdClassicAccent',
+  isValid: isHexColor,
+});
 
-const store = (key: string, value: string) => {
-  try {
-    localStorage.setItem(key, value);
-    return true;
-  } catch {
-    return false;
-  }
-};
+const prefs = createPanelPrefs(
+  {
+    href: () => location.href,
+    storage: () => localStorage,
+    // Keep the router's history state: React Router keeps its entry key there.
+    replaceUrl: (url) => history.replaceState(history.state, '', url),
+    navigate: (url) => location.replace(url),
+  },
+  [CONFIGURED_THEME, CHOSEN_THEME, ...(['classic', 'midnight'] as const).flatMap((t) => [modePref(t), accentPref(t)])]
+);
 
-/** Reloads the page with `param=value` in its URL, for when storage can't carry the theme. */
-const reloadInto = (param: string, value: string) => {
-  const url = new URL(location.href);
-  url.searchParams.set(param, value);
-  location.replace(url.toString());
-};
+/** Puts the token and carried preferences back in the URL after in-app navigation drops them. */
+export const keepPanelQuery = prefs.keepInUrl;
 
-// A theme picked in the Settings modal. Overrides both the config and the dev override below, so a
-// user's choice sticks on this panel until they pick again.
-const CHOICE_KEY = `pd-panel-theme-choice:${panelId}`;
-const chosenTheme = readStored(CHOICE_KEY) ?? urlParams.get(URL_CHOICE_PARAM);
+const chosenTheme = prefs.read(CHOSEN_THEME);
 
 // Local development override: VITE_FORCE_THEME in .env.local (gitignored) pins the theme and
 // ignores the panel's config, for previewing a theme without editing the processor's config.
 const forcedTheme: string | undefined = import.meta.env.DEV ? import.meta.env.VITE_FORCE_THEME : undefined;
 
-const configuredTheme = readStored(THEME_KEY) ?? urlParams.get(URL_THEME_PARAM);
-
-if ((chosenTheme ?? forcedTheme ?? configuredTheme) === 'midnight') {
+if ((chosenTheme ?? forcedTheme ?? prefs.read(CONFIGURED_THEME)) === 'midnight') {
   document.documentElement.dataset.theme = 'midnight';
 }
 
 // Fixed for the life of the page. Used to pick the thin outlined icon set, which the <img>-loaded
 // icons can't get from CSS.
 export const isMidnight = document.documentElement.dataset.theme === 'midnight';
+const pageTheme: ThemeName = isMidnight ? 'midnight' : 'classic';
 
-export type ThemeName = 'classic' | 'midnight';
+/**
+ * Saves `pref` and reloads into it - unless the value could only go in the URL and the page already
+ * loaded with it there, which means reloading won't change anything and would loop.
+ */
+const saveAndReload = (pref: PanelPref, theme: ThemeName) => {
+  if (prefs.write(pref, theme) === 'url' && prefs.loadedWith(pref) === theme) return;
+  prefs.reload();
+};
 
 /** Called with the panel's configured theme; reloads once if it doesn't match the page's. */
 export const applyConfiguredTheme = (configTheme: string) => {
-  const wantMidnight = configTheme === 'midnight';
-  if (chosenTheme !== null || forcedTheme !== undefined || wantMidnight === isMidnight) return;
-
-  const theme = wantMidnight ? 'midnight' : 'classic';
-  if (store(THEME_KEY, theme)) {
-    window.location.reload();
-    return;
-  }
-  // No storage: carry the theme in the URL. If the URL already asked for it and the page still
-  // didn't load into it, reloading again would loop, so stay as is.
-  if (urlParams.get(URL_THEME_PARAM) !== theme) reloadInto(URL_THEME_PARAM, theme);
+  const theme: ThemeName = configTheme === 'midnight' ? 'midnight' : 'classic';
+  if (chosenTheme !== null || forcedTheme !== undefined || theme === pageTheme) return;
+  saveAndReload(CONFIGURED_THEME, theme);
 };
 
 /** The Settings modal's theme picker: remembers the choice for this panel and reloads into it. */
 export const chooseTheme = (theme: ThemeName) => {
-  if (theme === (isMidnight ? 'midnight' : 'classic')) return;
-  if (store(CHOICE_KEY, theme)) window.location.reload();
-  else reloadInto(URL_CHOICE_PARAM, theme);
+  if (theme === pageTheme) return;
+  saveAndReload(CHOSEN_THEME, theme);
 };
 
 // Light/dark mode. Only colors change between the two (see styles.scss), so it's a data-mode
 // attribute on <html> rather than React state - nothing re-renders. Midnight defaults to dark and
 // the original theme to light; each theme remembers its own mode per panel.
-const MODE_KEY = `pd-${isMidnight ? 'midnight' : 'classic'}-mode:${panelId}`;
+const MODE = modePref(pageTheme);
 const DEFAULT_MODE: ColorMode = isMidnight ? 'dark' : 'light';
 
-export type ColorMode = 'dark' | 'light';
+const applyColorMode = (mode: ColorMode) => {
+  document.documentElement.dataset.mode = mode;
+  applyAccent(); // Midnight's highlight shade depends on the mode.
+};
 
 export const setColorMode = (mode: ColorMode) => {
-  document.documentElement.dataset.mode = mode;
-  store(MODE_KEY, mode); // If storage fails, the mode still applies for this session.
-  applyAccent(); // Midnight's highlight shade depends on the mode.
+  prefs.write(MODE, mode);
+  applyColorMode(mode);
 };
 
 export const getColorMode = (): ColorMode =>
@@ -114,8 +117,8 @@ export const getColorMode = (): ColorMode =>
 // Accent color, picked in the Settings modal. Each theme remembers its own per panel; none stored
 // means the theme's built-in accent from styles.scss. A picked color is written as inline custom
 // properties on <html>, which override the stylesheet's.
-const ACCENT_KEY = `pd-${isMidnight ? 'midnight' : 'classic'}-accent:${panelId}`;
-let accent = readStored(ACCENT_KEY);
+const ACCENT = accentPref(pageTheme);
+let accent = prefs.read(ACCENT);
 
 type Rgb = [number, number, number];
 
@@ -205,16 +208,9 @@ export const getAccentColor = () => accent;
 /** Sets this panel's accent color (#rrggbb), or null to go back to the theme's own. */
 export const setAccentColor = (color: string | null) => {
   accent = color;
-  if (color) store(ACCENT_KEY, color);
-  else {
-    try {
-      localStorage.removeItem(ACCENT_KEY);
-    } catch {
-      // Nothing stored to remove.
-    }
-  }
+  prefs.write(ACCENT, color);
   applyAccent();
 };
 
-const storedMode = readStored(MODE_KEY);
-setColorMode(storedMode === 'dark' || storedMode === 'light' ? storedMode : DEFAULT_MODE);
+// Applied, not saved: nothing has changed yet, so there's nothing to write.
+applyColorMode((prefs.read(MODE) as ColorMode | null) ?? DEFAULT_MODE);
