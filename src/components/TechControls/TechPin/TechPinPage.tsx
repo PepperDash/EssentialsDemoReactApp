@@ -10,7 +10,7 @@ import classes from './TechPinPage.module.scss';
 const INCORRECT_DISPLAY_MS = 1500;
 
 /**
- * PIN gate for the tech pages, reached by holding the header's audio controls icon for 3 seconds
+ * PIN gate for the tech pages, reached by holding the header's settings icon for 3 seconds
  * (see `Header`) - reachable whether the room is on or off (see `RoomBusiness`).
  *
  * The PIN itself never reaches the client: entry is submitted to `ITechPassword.ValidateTechPassword`

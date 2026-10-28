@@ -53,8 +53,7 @@ interface HeaderProps {
   onLightingPress?: () => void;
   /** Override the help icon's default action. */
   onHelpPress?: () => void;
-  /** Override the audio controls icon's default tap action (a short press; a 3s hold always goes
-   * to the tech PIN regardless of this override). */
+  /** Override the audio controls icon's default action. */
   onAudioPress?: () => void;
 }
 
@@ -62,11 +61,11 @@ interface HeaderProps {
  * Common header rendered at the top of every user-facing page: room name, live clock, and quick
  * access to lighting, help, audio controls, and settings (theme and light/dark mode).
  *
- * Lighting and help open a `HeaderModalOverlay` panel - a dimmed overlay above whatever page is
- * currently showing, not a route, since the same icon has to work identically from every page
- * regardless of what's underneath it. The audio controls icon is overloaded: a short press opens
- * its modal the same way, but holding it for 3 seconds instead routes to the PIN-gated tech pages
- * - the same icon, not a fourth one, matching the design.
+ * Lighting, help and audio controls open a `HeaderModalOverlay` panel - a dimmed overlay above
+ * whatever page is currently showing, not a route, since the same icon has to work identically from
+ * every page regardless of what's underneath it. The settings icon is overloaded: a short press
+ * opens its modal the same way, but holding it for 3 seconds instead routes to the PIN-gated tech
+ * pages.
  */
 export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderProps) => {
   const roomKey = useRoomKey();
@@ -81,9 +80,13 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
     `${classes.iconButton} ${activeModal === modal ? classes.active : ''}`;
   const navigate = useNavigate();
 
-  const audioControlsPress = usePressHoldRelease({
-    onPressedButNotHeld: onAudioPress ?? (() => toggleModal('audio')),
-    onHold: () => navigate('/techPin'),
+  const settingsPress = usePressHoldRelease({
+    onPressedButNotHeld: () => toggleModal('settings'),
+    // Header modals overlay every route, so close any open one or it would cover the PIN page.
+    onHold: () => {
+      closeModal();
+      navigate('/techPin');
+    },
     holdTimeMs: TECH_PIN_HOLD_MS,
   });
 
@@ -117,15 +120,15 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
           multiIcon={AudioControlsIcon}
           className={buttonClass('audio')}
           iconClassName={classes.icon}
-          aria-label="Audio controls (hold 3 seconds for tech access)"
-          {...audioControlsPress}
+          aria-label="Audio controls"
+          onClick={onAudioPress ?? (() => toggleModal('audio'))}
         />
         <IconButton
           multiIcon={SettingsIcon}
           className={buttonClass('settings')}
           iconClassName={classes.icon}
-          aria-label="Settings"
-          onClick={() => toggleModal('settings')}
+          aria-label="Settings (hold 3 seconds for tech access)"
+          {...settingsPress}
         />
       </div>
     </header>
