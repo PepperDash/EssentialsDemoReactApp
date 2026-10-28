@@ -6,6 +6,7 @@ import dagre from 'dagre';
 import { HEADER_PX, NODE_WIDTH_PX, PORT_ROW_PX, RoutingDeviceNodeData } from './RoutingDeviceNode';
 import { MidpointRoute, RoutingDevice, RoutingDevicesAndTieLines, SinkRoute, TieLine } from './routingTypes';
 import { signalColor } from './signalColors';
+import { parseSignalFlags } from './signalTypes';
 
 const NODE_WIDTH = NODE_WIDTH_PX;
 const NODE_SEP = 60;
@@ -238,10 +239,27 @@ export function buildGraph(
 
 // ─── Signal path tracing ─────────────────────────────────────────────────────
 
+/** A signal type's atoms, or null when it isn't reported (which matches anything). */
+type SignalFlags = ReadonlySet<string> | null;
+
+const flagsOf = (signalType: string | null | undefined): SignalFlags => {
+  const flags = parseSignalFlags(signalType);
+  return flags.size > 0 ? flags : null;
+};
+
+/** The atoms in both, treating null as "anything". */
+const narrow = (a: SignalFlags, b: SignalFlags): SignalFlags =>
+  a === null ? b : b === null ? a : new Set([...a].filter((atom) => b.has(atom)));
+
+const isEmpty = (flags: SignalFlags) => flags !== null && flags.size === 0;
+
 /**
- * Given a clicked edge, traces the full signal path from source to sink through
- * midpoint devices using midpointRoutes data.  Returns a Set of edge IDs that
- * form the continuous path.
+ * Given a clicked edge, traces the full signal path from source to sink through midpoint devices
+ * using midpointRoutes data. Returns a Set of edge IDs that form the continuous path.
+ *
+ * The trace follows only the clicked edge's signal: at each midpoint route and tie line the signal
+ * narrows to what both carry, and a branch that carries none of it stops. So on a breakaway output
+ * (Video from one input, Audio from another), tracing a Video edge doesn't pull in the Audio input.
  */
 export function traceSignalPath(
   edges: Edge[],
@@ -253,6 +271,7 @@ export function traceSignalPath(
     sourcePortKey?: string;
     destinationDeviceKey?: string;
     destinationPortKey?: string;
+    signalType?: string;
   }
 
   const result = new Set<string>();
@@ -265,9 +284,9 @@ export function traceSignalPath(
 
   // Build lookup maps. A port can carry multiple tie lines (fan-out from an
   // output, fan-in to an input), so each key maps to every matching edge.
-  // "deviceKey:portKey" → edges that ARRIVE at that input port
+  // "deviceKey:portKey" -> edges that ARRIVE at that input port
   const edgesByDestPort = new Map<string, Edge[]>();
-  // "deviceKey:portKey" → edges that LEAVE from that output port
+  // "deviceKey:portKey" -> edges that LEAVE from that output port
   const edgesBySrcPort = new Map<string, Edge[]>();
 
   const addTo = (map: Map<string, Edge[]>, key: string, e: Edge) => {
@@ -279,68 +298,60 @@ export function traceSignalPath(
   for (const e of edges) {
     const ed = d(e);
     addTo(edgesBySrcPort, `${ed.sourceDeviceKey}:${ed.sourcePortKey}`, e);
-    addTo(
-      edgesByDestPort,
-      `${ed.destinationDeviceKey}:${ed.destinationPortKey}`,
-      e
-    );
+    addTo(edgesByDestPort, `${ed.destinationDeviceKey}:${ed.destinationPortKey}`, e);
   }
 
-  // Trace upstream from the clicked edge's source
-  function traceUpstream(
-    deviceKey: string | undefined,
-    outputPortKey: string | undefined
-  ) {
+  // An edge is skipped once it has been reached carrying the same signal, so a narrower visit
+  // can't stop a wider one from going further.
+  const visited = new Set<string>();
+  const firstVisit = (edge: Edge, flags: SignalFlags) => {
+    const key = `${edge.id}|${flags === null ? '*' : [...flags].sort().join(',')}`;
+    if (visited.has(key)) return false;
+    visited.add(key);
+    return true;
+  };
+
+  // Trace upstream from an output port, through the routes feeding it
+  function traceUpstream(deviceKey: string | undefined, outputPortKey: string | undefined, flags: SignalFlags) {
     if (!deviceKey || !outputPortKey) return;
     const routes = midpointRoutes[deviceKey];
     if (!routes) return;
-    // Find ALL input ports that feed this output port
-    const matchingRoutes = routes.filter(
-      (r) => r.outputPortKey === outputPortKey
-    );
-    for (const route of matchingRoutes) {
-      for (const incomingEdge of edgesByDestPort.get(
-        `${deviceKey}:${route.inputPortKey}`
-      ) ?? []) {
-        if (result.has(incomingEdge.id)) continue;
-        result.add(incomingEdge.id);
+    for (const route of routes.filter((r) => r.outputPortKey === outputPortKey)) {
+      const viaRoute = narrow(flags, flagsOf(route.signalType));
+      if (isEmpty(viaRoute)) continue;
+      for (const incomingEdge of edgesByDestPort.get(`${deviceKey}:${route.inputPortKey}`) ?? []) {
         const ed = d(incomingEdge);
-        traceUpstream(ed.sourceDeviceKey, ed.sourcePortKey);
+        const viaEdge = narrow(viaRoute, flagsOf(ed.signalType));
+        if (isEmpty(viaEdge) || !firstVisit(incomingEdge, viaEdge)) continue;
+        result.add(incomingEdge.id);
+        traceUpstream(ed.sourceDeviceKey, ed.sourcePortKey, viaEdge);
       }
     }
   }
 
-  // Trace downstream from the clicked edge's destination
-  function traceDownstream(
-    deviceKey: string | undefined,
-    inputPortKey: string | undefined
-  ) {
+  // Trace downstream from an input port, through the routes it feeds
+  function traceDownstream(deviceKey: string | undefined, inputPortKey: string | undefined, flags: SignalFlags) {
     if (!deviceKey || !inputPortKey) return;
     const routes = midpointRoutes[deviceKey];
     if (!routes) return;
-    // Find ALL output ports that this input port feeds
-    const matchingRoutes = routes.filter(
-      (r) => r.inputPortKey === inputPortKey
-    );
-    for (const route of matchingRoutes) {
-      for (const outgoingEdge of edgesBySrcPort.get(
-        `${deviceKey}:${route.outputPortKey}`
-      ) ?? []) {
-        if (result.has(outgoingEdge.id)) continue;
-        result.add(outgoingEdge.id);
+    for (const route of routes.filter((r) => r.inputPortKey === inputPortKey)) {
+      const viaRoute = narrow(flags, flagsOf(route.signalType));
+      if (isEmpty(viaRoute)) continue;
+      for (const outgoingEdge of edgesBySrcPort.get(`${deviceKey}:${route.outputPortKey}`) ?? []) {
         const ed = d(outgoingEdge);
-        traceDownstream(ed.destinationDeviceKey, ed.destinationPortKey);
+        const viaEdge = narrow(viaRoute, flagsOf(ed.signalType));
+        if (isEmpty(viaEdge) || !firstVisit(outgoingEdge, viaEdge)) continue;
+        result.add(outgoingEdge.id);
+        traceDownstream(ed.destinationDeviceKey, ed.destinationPortKey, viaEdge);
       }
     }
   }
 
-  // Start tracing in both directions from the clicked edge
+  // Start tracing in both directions from the clicked edge, carrying its signal
   const clickedData = d(clickedEdge);
-  traceUpstream(clickedData.sourceDeviceKey, clickedData.sourcePortKey);
-  traceDownstream(
-    clickedData.destinationDeviceKey,
-    clickedData.destinationPortKey
-  );
+  const clickedFlags = flagsOf(clickedData.signalType);
+  traceUpstream(clickedData.sourceDeviceKey, clickedData.sourcePortKey, clickedFlags);
+  traceDownstream(clickedData.destinationDeviceKey, clickedData.destinationPortKey, clickedFlags);
 
   return result;
 }

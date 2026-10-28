@@ -272,7 +272,7 @@ const RoutePopover = ({
         </div>
       </div>
 
-      <div>
+      <div className={styles.body}>
         {/* Step 1 - signal type */}
         <div className={styles.section}>
           <div className={styles.sectionLabel}>Signal type</div>

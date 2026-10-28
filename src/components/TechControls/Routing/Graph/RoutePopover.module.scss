@@ -61,6 +61,15 @@
   cursor: pointer;
 }
 
+// Everything below the header. A shrinking flex column, so a long option list scrolls inside the
+// panel's max-height instead of being clipped.
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .section {
   padding: 10px 14px 4px;
 }

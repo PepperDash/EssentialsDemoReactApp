@@ -108,4 +108,22 @@ describe('traceSignalPath with the demo topology', () => {
     expect(path.has(laptopEdge.id)).toBe(true);
     expect(path.has(mediaEdge.id)).toBe(false);
   });
+
+  it('follows only the clicked signal through a breakaway output', () => {
+    // Video from the laptop and Audio from the media player, both switched to the Left Display
+    // output. The matrix-to-display tie line is Video, so tracing it must not pull in the media
+    // player's Audio route.
+    const { edges } = buildGraph({ devices, tieLines }, NONE, true, NONE, false, {});
+    const toLeftDisplay = edges.find((e) => e.target === 'display-1')!;
+
+    const path = traceSignalPath(edges, toLeftDisplay.id, {
+      'matrix-router': [
+        { inputPortKey: 'source-laptop', outputPortKey: 'display-1', signalType: 'Video' },
+        { inputPortKey: 'source-media', outputPortKey: 'display-1', signalType: 'Audio' },
+      ],
+    });
+
+    expect(path.has(edges.find((e) => e.source === 'source-laptop')!.id)).toBe(true);
+    expect(path.has(edges.find((e) => e.source === 'source-media')!.id)).toBe(false);
+  });
 });
