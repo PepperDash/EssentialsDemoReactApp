@@ -1,0 +1,189 @@
+// Adapted from the Dev Tools app's RoutePopover.module.scss for the dark tech pages, with
+// touch-sized rows.
+
+.panel {
+  position: fixed;
+  width: 320px;
+  max-height: calc(100vh - 16px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--pd-border);
+  border-radius: 10px;
+  background-color: var(--pd-tech-panel);
+  color: var(--pd-text-inverse);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+}
+
+.header {
+  padding: 10px 14px;
+  background-color: var(--pd-neutral);
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deviceName {
+  font-size: 16px;
+}
+
+.portLabel {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.closeBtn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 18px;
+  background: none;
+  color: var(--pd-text-inverse);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.section {
+  padding: 10px 14px 4px;
+}
+
+.sectionLabel {
+  margin-bottom: 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.signalTypeOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// --signal-color is set as an inline CSS variable per button.
+.signalTypeBtn {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 2px solid var(--signal-color);
+  border-radius: 18px;
+  background-color: var(--signal-color);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+
+  &.signalTypeBtnInactive {
+    background-color: transparent;
+  }
+}
+
+.signalTypeStatic {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 14px;
+  color: #fff;
+}
+
+.filterInput {
+  width: 100%;
+  min-height: 36px;
+  margin-bottom: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--pd-border);
+  border-radius: 6px;
+  background-color: var(--pd-tech-bg);
+  color: var(--pd-text-inverse);
+  font: inherit;
+}
+
+.optionScroller {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 6px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 14px;
+  border: none;
+  border-top: 1px solid var(--pd-divider);
+  background: none;
+  color: var(--pd-text-inverse);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.optionClear {
+  opacity: 0.8;
+}
+
+.optionCurrent {
+  background-color: var(--pd-neutral);
+}
+
+.optionCheck {
+  flex-shrink: 0;
+  width: 16px;
+  color: var(--pd-accent);
+}
+
+.optionLabel {
+  font-size: 15px;
+}
+
+.optionSublabel {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.optionBadge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background-color: var(--pd-warning);
+  color: #000;
+  font-size: 12px;
+}
+
+.emptyMessage {
+  padding: 10px 14px;
+  opacity: 0.7;
+}
+
+.status {
+  padding: 10px 14px;
+  border-top: 1px solid var(--pd-divider);
+}
+
+.error {
+  background-color: var(--pd-danger);
+}

@@ -1,14 +1,25 @@
 import { useINamedRoutingSlots } from '@pepperdash/mobile-control-react-app-core';
 import type { SignalType } from '@pepperdash/mobile-control-react-app-core';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useTechRoutingDeviceKey } from '../../../hooks/useTechRoutingDeviceKey';
 import InputList, { NONE_INPUT } from './InputList';
 import MatrixSelect from './MatrixSelect';
 import OutputList from './OutputList';
 import classes from './RoutingPage.module.scss';
+import RoutingModeSelect from './RoutingModeSelect';
+import { useRoutingMode } from './useRoutingMode';
+
+// React Flow and dagre are most of the graph's weight, so they load only when Graph mode is opened.
+const RoutingGraphView = lazy(() => import('./Graph/RoutingGraphView'));
 
 /**
- * Tech Routing page: a classic matrix-switcher "tie" control for `techRoutingDeviceKey`. Pick a
+ * Tech Routing page, in one of two modes (remembered per panel):
+ *
+ * - **Matrix**, below: the tie control for `techRoutingDeviceKey`.
+ * - **Graph**: every routing device and tie line in the system, routable from any destination or
+ *   midpoint (see `RoutingGraphView`).
+ *
+ * Matrix mode is a classic matrix-switcher "tie" control for `techRoutingDeviceKey`. Pick a
  * signal type (Audio/Video/Audio & Video), pick an input (or "None" to clear), then tap an output
  * to apply it - each output tile shows its current audio/video crosspoints live.
  *
@@ -24,6 +35,25 @@ import classes from './RoutingPage.module.scss';
  * here once a new `PepperDashEssentials` package version containing it is referenced.
  */
 export const RoutingPage = () => {
+  const [mode, setMode] = useRoutingMode();
+
+  return (
+    <div className={classes.page}>
+      <RoutingModeSelect mode={mode} onChange={setMode} />
+      {mode === 'graph' ? (
+        <div className={classes.graph}>
+          <Suspense fallback={null}>
+            <RoutingGraphView />
+          </Suspense>
+        </div>
+      ) : (
+        <MatrixRouting />
+      )}
+    </div>
+  );
+};
+
+const MatrixRouting = () => {
   const routingDeviceKey = useTechRoutingDeviceKey();
   const routing = useINamedRoutingSlots(routingDeviceKey ?? '');
 
@@ -44,14 +74,14 @@ export const RoutingPage = () => {
   };
 
   return (
-    <div className={classes.page}>
+    <>
       <MatrixSelect signalType={signalType} onChange={setSignalType} />
 
       <div className={classes.main}>
         <InputList inputs={inputSlots} selectedInputKey={selectedInputKey} onSelect={setSelectedInputKey} />
         <OutputList outputs={outputSlots} inputSlots={inputSlots} onSelect={applyToOutput} />
       </div>
-    </div>
+    </>
   );
 };
 
