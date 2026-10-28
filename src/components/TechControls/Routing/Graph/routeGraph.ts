@@ -34,7 +34,7 @@ import {
   RoutingDevicesAndTieLines,
   TieLine,
 } from './routingTypes';
-import { atomsOf, carriesAtom, parseSignalFlags } from './signalTypes';
+import { atomsOf, parseSignalFlags } from './signalTypes';
 
 /** A tie line with its signal type pre-parsed, so traversal never re-parses strings. */
 interface IndexedTieLine {
@@ -278,9 +278,10 @@ function describeNoCandidates(
     return 'Nothing is wired to this input. Routing follows the tie lines in the configuration, and this port has none.';
   }
 
+  // The same test the route search applies to each tie line (findReachableUpstreamDevices).
   const atoms = atomsOf(signalType);
-  const carriesRequest = incoming.some((t) =>
-    atoms.some((atom) => carriesAtom(t.tieLine.signalType, atom))
+  const carriesRequest = incoming.some(({ flags }) =>
+    atoms.some((atom) => flags.has(atom))
   );
   if (carriesRequest) {
     return `This input is wired for ${signalType}, but no device it's wired back to can be selected as a source.`;

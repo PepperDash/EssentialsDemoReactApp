@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo } from 'react';
 
 /**
  * Returns `value`, keeping the previous object while its contents are unchanged.
@@ -9,8 +9,7 @@ import { useRef } from 'react';
  * room-sized data, not large collections.
  */
 export function useContentStable<T>(value: T): T {
-  const ref = useRef<{ json: string; value: T } | null>(null);
-  const json = JSON.stringify(value) ?? '';
-  if (ref.current?.json !== json) ref.current = { json, value };
-  return ref.current.value;
+  const json = JSON.stringify(value) ?? 'null';
+  // A copy rebuilt from the JSON, so the result changes exactly when the contents do.
+  return useMemo(() => JSON.parse(json) as T, [json]);
 }
