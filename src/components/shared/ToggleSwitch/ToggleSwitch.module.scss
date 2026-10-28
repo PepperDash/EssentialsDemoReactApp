@@ -41,6 +41,7 @@ $knob-color: var(--pd-knob);
     .label {
       text-align: left;
       padding-left: 8px;
+      color: var(--pd-on-active, var(--pd-text-inverse)); // Readable on a picked accent too.
     }
 
     .knob {

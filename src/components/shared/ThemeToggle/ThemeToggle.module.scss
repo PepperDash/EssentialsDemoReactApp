@@ -1,31 +1,23 @@
 @use '../../../theme/midnight' as *;
 
-// Matches the Advanced toggle in the sources band: small caps caption to the left of a glass pill.
-.wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.caption {
-  @include caps-label;
-  font-size: 11px;
-  color: var(--pd-text);
-}
-
+// The original theme: a gray pill like its other toggles. Stays gray when on - only the knob moves
+// and the showing icon changes.
 .track {
-  @include glass;
   position: relative;
   width: 76px;
   height: 40px;
   border-radius: 85px;
+  background-color: var(--pd-pill);
 
-  // Stays glass when on - only the knob moves and its icon changes.
-  &.on {
-    @include pulse(theme-toggle-pulse, 'var(--pd-glass-shadow)');
+  &.on .knob {
+    transform: translateX(36px);
+  }
 
-    .knob {
-      transform: translateX(36px);
+  @include midnight {
+    @include glass;
+
+    &.on {
+      @include pulse(theme-toggle-pulse, 'var(--pd-glass-shadow)');
     }
   }
 }
@@ -35,12 +27,20 @@
   top: 4px;
   left: 4px;
   z-index: 1; // Covers the icon of the inactive mode.
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: linear-gradient(180deg, #fff, #d6e2f5);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  background: var(--pd-knob);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   transition: transform 0.15s ease;
+
+  @include midnight {
+    top: 4px;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(180deg, #fff, #d6e2f5);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  }
 }
 
 .icon {

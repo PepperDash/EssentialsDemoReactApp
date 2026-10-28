@@ -24,7 +24,8 @@ $text-color: var(--pd-text);
   cursor: pointer;
 
   &.active {
-    .label {
+    .label,
+    .maskIcon {
       color: $active-color;
     }
 
@@ -38,6 +39,15 @@ $text-color: var(--pd-text);
   width: 88px;
   height: 80px;
   filter: var(--pd-icon-filter);
+}
+
+.maskIcon {
+  display: block;
+  color: var(--pd-text);
+  background-color: currentColor;
+  filter: none; // Colored by `color` directly, in light and dark mode alike.
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
 }
 
 .label {
@@ -116,9 +126,3 @@ $text-color: var(--pd-text);
   }
 }
 
-// Midnight's light/dark switch, pinned to the band's bottom-right corner.
-.themeToggle {
-  position: absolute;
-  right: 24px;
-  bottom: 18px;
-}

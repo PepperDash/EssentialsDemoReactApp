@@ -3,6 +3,7 @@ import HeaderModalOverlay from './HeaderModalOverlay';
 import LightingModal from './LightingModal/LightingModal';
 import HelpModal from './HelpModal/HelpModal';
 import AudioControlsModal from './AudioControlsModal/AudioControlsModal';
+import SettingsModal from './SettingsModal/SettingsModal';
 
 /**
  * Renders whichever header-triggered modal is currently open, if any. A sibling of the page
@@ -19,6 +20,7 @@ export const HeaderModalOutlet = () => {
       {activeModal === 'lighting' && <LightingModal />}
       {activeModal === 'help' && <HelpModal />}
       {activeModal === 'audio' && <AudioControlsModal />}
+      {activeModal === 'settings' && <SettingsModal />}
     </HeaderModalOverlay>
   );
 };
