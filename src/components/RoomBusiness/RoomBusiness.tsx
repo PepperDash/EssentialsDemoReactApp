@@ -64,7 +64,7 @@ const RoomBusiness = () => {
         <Routes>
           {/* The room-off splash screen is only ever the "/" view, not a route of its own - held
               behind isOn rather than living under its own path. /techPin (held from the header's
-              audio icon) and the tech pages behind it need to work whether or not the room is on,
+              settings icon) and the tech pages behind it need to work whether or not the room is on,
               so they're routes here regardless of isOn, unlike the splash/home split. */}
           <Route
             path="/"
