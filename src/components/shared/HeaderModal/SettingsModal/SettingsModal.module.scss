@@ -166,3 +166,16 @@
     }
   }
 }
+
+// Opens the technician pages. Full width, below the settings, so it reads as a way out rather
+// than another setting.
+.techButton {
+  margin-top: 8px;
+  padding: 14px 22px;
+  border-radius: 10px;
+  background-color: var(--pd-neutral);
+  color: var(--pd-text-inverse);
+  font-weight: var(--pd-weight-light);
+  font-size: 18px;
+  line-height: 22px;
+}

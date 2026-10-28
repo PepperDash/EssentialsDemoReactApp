@@ -3,7 +3,7 @@ import classes from './TechConfirmDialog.module.scss';
 /**
  * A full-screen confirmation dialog for a destructive tech action (reboot, program reset) - unlike
  * `HeaderModalOverlay` (positioned below the header, light card, for room-view pages), this covers
- * the whole tech page including the nav, matching `TechPinPage`'s full takeover.
+ * the whole tech page including the nav.
  */
 export const TechConfirmDialog = ({
   title,

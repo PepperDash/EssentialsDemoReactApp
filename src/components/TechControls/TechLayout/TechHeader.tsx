@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import classes from './TechHeader.module.scss';
 
 /**
- * Header for the PIN-gated tech pages - a black bar with the room name and clock like the regular
+ * Header for the tech pages - a black bar with the room name and clock like the regular
  * `Header`, but an "Exit Technician Controls" button in place of the lighting/help/audio icons,
- * since none of those apply once a tech is behind the PIN gate.
+ * since none of those apply on the tech pages.
  */
 export const TechHeader = () => {
   const roomKey = useRoomKey();

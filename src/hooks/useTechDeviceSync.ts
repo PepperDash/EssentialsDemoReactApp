@@ -17,8 +17,8 @@ const FULL_STATUS = '/fullStatus';
  *
  * These devices exist purely to back the tech pages (see `DemoRoomTechConfig`), so unlike the
  * room's real AV devices - synced eagerly at boot by `useInitialDeviceSync` - there's no reason to
- * ask about them until a tech actually gets past the PIN gate. One batch covers every tech page
- * rather than each page syncing its own slice, since they all sit behind the same gate anyway.
+ * ask about them until a tech actually opens the tech pages. One batch covers every tech page
+ * rather than each page syncing its own slice, since they're all reached the same way anyway.
  *
  * Only devices this connection hasn't already requested are sent (the boot sync may have covered some),
  * and nothing is sent if there are none. `techDevicesSynced` is still set either way, because it records
