@@ -88,6 +88,7 @@ export const ActivityFooter = () => {
         vert
         className={classes.button}
         iconClassName={classes.icon}
+        data-tour="end-session"
         onClick={() => shutdown?.shutdownStart()}
         otherContent={
           <>

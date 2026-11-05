@@ -53,7 +53,7 @@ export const AdvancedSourceSelection = ({ tabsContainer }: AdvancedSourceSelecti
 
   return (
     <>
-      <div className={classes.destinationList}>
+      <div className={classes.destinationList} data-tour="destinations">
         {destinations.map((destination) => (
           <DestinationCard
             key={destination.sinkKey}

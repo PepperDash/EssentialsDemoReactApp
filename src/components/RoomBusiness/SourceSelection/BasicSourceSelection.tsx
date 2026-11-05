@@ -32,10 +32,12 @@ export const BasicSourceSelection = ({ tabsContainer }: BasicSourceSelectionProp
     <>
       <div className={classes.destination}>
         {isOffSelected ? (
-          <p className={classes.title}>Select a source below</p>
+          <p className={classes.title} data-tour="sharing-status">
+            Select a source below
+          </p>
         ) : (
           // TODO: placeholder - the active-source content view hasn't been designed yet.
-          <div className={classes.titleGroup}>
+          <div className={classes.titleGroup} data-tour="sharing-status">
             <p className={classes.title}>
               <SyncStatusDot deviceKey={selectedSourceDeviceKey} />
               Sharing {selectedSourceName}

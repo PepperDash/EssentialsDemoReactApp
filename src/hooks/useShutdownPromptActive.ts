@@ -8,15 +8,17 @@ import { useEffect, useState } from 'react';
  * stops, so it can't be derived from state alone.
  *
  * A panel that connects mid-countdown won't see the prompt until the next `timerStarted`.
+ *
+ * Each caller needs its own `handlerKey`: a second handler registered under the same key replaces
+ * the first.
  */
-export function useShutdownPromptActive(roomKey: string): boolean {
+export function useShutdownPromptActive(roomKey: string, handlerKey = 'shutdownPrompt'): boolean {
   const { addEventHandler, removeEventHandler } = useWebsocketContext();
   const [active, setActive] = useState(false);
 
   useEffect(() => {
     if (!roomKey) return;
 
-    const handlerKey = 'shutdownPrompt';
     const subscriptions: [string, boolean][] = [
       ['timerStarted', true],
       ['timerFinished', false],
@@ -29,7 +31,7 @@ export function useShutdownPromptActive(roomKey: string): boolean {
 
     return () =>
       subscriptions.forEach(([event]) => removeEventHandler(`/event/room/${roomKey}/${event}`, handlerKey));
-  }, [roomKey, addEventHandler, removeEventHandler]);
+  }, [roomKey, handlerKey, addEventHandler, removeEventHandler]);
 
   return active;
 }

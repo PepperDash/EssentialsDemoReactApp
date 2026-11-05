@@ -78,7 +78,9 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
     <header className={classes.header}>
       <div className={classes.left}>
         {isMidnight && <img src={companyLogoUrl} alt="Acme" className={classes.companyLogo} />}
-        <span className={classes.roomName}>{roomName}</span>
+        <span className={classes.roomName} data-tour="room-name">
+          {roomName}
+        </span>
       </div>
 
       <div className={classes.center}>
@@ -98,6 +100,7 @@ export const Header = ({ onLightingPress, onHelpPress, onAudioPress }: HeaderPro
           className={buttonClass('help')}
           iconClassName={classes.icon}
           aria-label="Help"
+          data-tour="help-button"
           onClick={onHelpPress ?? (() => toggleModal('help'))}
         />
         <IconButton

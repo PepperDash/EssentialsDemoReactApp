@@ -6,6 +6,7 @@ import ToggleSwitch from '../shared/ToggleSwitch/ToggleSwitch';
 import BasicSourceSelection from './SourceSelection/BasicSourceSelection';
 import AdvancedSourceSelection from './SourceSelection/AdvancedSourceSelection';
 import { isMidnight } from '../../theme/theme';
+import { useTour } from '../../hooks/useTour';
 import classes from './RoomHome.module.scss';
 
 /**
@@ -19,9 +20,14 @@ import classes from './RoomHome.module.scss';
  * column a fixed 112px, but this design (every page so far) specifies a 75px header and 140px
  * gutters throughout. Forcing MainLayout would leave a visible gap under the header. `Header`,
  * `Fader`, and `ActivityFooter` are still the same reusable pieces either way.
+ *
+ * While the guided tour runs, it decides whether Advanced shows (see `TourProvider`); the user's
+ * own choice comes back when the tour ends.
  */
 export const RoomHome = () => {
-  const [advancedSharing, setAdvancedSharing] = useState(false);
+  const [advancedChoice, setAdvancedSharing] = useState(false);
+  const tour = useTour();
+  const advancedSharing = tour.advanced ?? advancedChoice;
   // Midnight shows the source buttons in their own full-width band above the activity footer.
   // Basic/advanced selection still own the buttons and portal them into this element; undefined
   // (the original theme) keeps them inline in the content area.
@@ -30,11 +36,13 @@ export const RoomHome = () => {
 
   // Midnight moves this toggle into the sources band too.
   const advancedToggle = (
-    <ToggleSwitch
-      caption={advancedSharing || isMidnight ? 'Advanced' : 'Advanced Sharing'}
-      on={advancedSharing}
-      onChange={setAdvancedSharing}
-    />
+    <div data-tour="advanced-toggle">
+      <ToggleSwitch
+        caption={advancedSharing || isMidnight ? 'Advanced' : 'Advanced Sharing'}
+        on={advancedSharing}
+        onChange={setAdvancedSharing}
+      />
+    </div>
   );
 
   return (
@@ -52,7 +60,7 @@ export const RoomHome = () => {
           )}
         </div>
 
-        <div className={classes.rightGutter}>
+        <div className={classes.rightGutter} data-tour="volume">
           <Fader />
         </div>
       </div>

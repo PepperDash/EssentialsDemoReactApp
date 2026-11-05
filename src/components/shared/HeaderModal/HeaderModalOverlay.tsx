@@ -30,7 +30,7 @@ export const HeaderModalOverlay = ({ children }: HeaderModalOverlayProps) => {
         if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') closeModal();
       }}
     >
-      <div className={classes.card} onClick={(event) => event.stopPropagation()}>
+      <div className={classes.card} data-tour="header-modal" onClick={(event) => event.stopPropagation()}>
         {children}
       </div>
     </div>
