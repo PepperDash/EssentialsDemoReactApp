@@ -57,7 +57,7 @@ export const SourceTabs = ({ selectedKey, onSelect }: SourceTabsProps) => {
     : contentEntries.map(([key, item]) => ({ key, label: item.preferredName }));
 
   return (
-    <div className={classes.sourceList} ref={listRef}>
+    <div className={classes.sourceList} ref={listRef} data-tour="sources">
       {tabs.map((tab) => (
         <button
           key={tab.key}

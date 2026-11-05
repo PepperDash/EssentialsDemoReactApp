@@ -5,6 +5,7 @@ import { useHasCompletedInitialSync } from '../../hooks/useHasCompletedInitialSy
 import { useInitialDeviceSync } from '../../hooks/useInitialDeviceSync';
 import { DemoRoomState } from '../../types/DemoRoomState';
 import { HeaderModalProvider } from '../../context/HeaderModalProvider';
+import { TourProvider } from '../../context/TourProvider';
 import SyncingPage from '../SyncingPage/SyncingPage';
 import SplashScreen from './SplashScreen';
 import RoomHome from './RoomHome';
@@ -12,6 +13,7 @@ import PageFade from './PageFade/PageFade';
 import { isMidnight } from '../../theme/theme';
 import HeaderModalOutlet from '../shared/HeaderModal/HeaderModalOutlet';
 import ShutdownPrompt from '../shared/ShutdownPrompt/ShutdownPrompt';
+import TourOverlay from '../shared/Tour/TourOverlay';
 import TechLayout from '../TechControls/TechLayout/TechLayout';
 import SystemStatusPage from '../TechControls/SystemStatus/SystemStatusPage';
 import DisplaysPage from '../TechControls/Displays/DisplaysPage';
@@ -57,44 +59,48 @@ const RoomBusiness = () => {
     // HeaderModalProvider wraps every route so the header's lighting/help/audio icons open the
     // same overlay no matter which page they're pressed from. HeaderModalOutlet is a sibling of
     // the routed content, not nested inside it, and positions itself against this wrapper - see
-    // RoomBusiness.module.scss.
+    // RoomBusiness.module.scss. TourProvider sits inside it, since the tour's steps open those
+    // modals.
     <HeaderModalProvider>
-      <div className={classes.wrapper}>
-        <Routes>
-          {/* The room-off splash screen is only ever the "/" view, not a route of its own - held
-              behind isOn rather than living under its own path. The tech pages (opened from the
-              Settings modal) need to work whether or not the room is on, so they're routes here
-              regardless of isOn, unlike the splash/home split. */}
-          <Route
-            path="/"
-            element={
-              isOn ? (
-                <>
-                  <RoomHome />
-                  {fading && <PageFade outgoing={<SplashScreen />} onDone={endFade} />}
-                </>
-              ) : (
-                <SplashScreen />
-              )
-            }
-          />
+      <TourProvider>
+        <div className={classes.wrapper}>
+          <Routes>
+            {/* The room-off splash screen is only ever the "/" view, not a route of its own - held
+                behind isOn rather than living under its own path. The tech pages (opened from the
+                Settings modal) need to work whether or not the room is on, so they're routes here
+                regardless of isOn, unlike the splash/home split. */}
+            <Route
+              path="/"
+              element={
+                isOn ? (
+                  <>
+                    <RoomHome />
+                    {fading && <PageFade outgoing={<SplashScreen />} onDone={endFade} />}
+                  </>
+                ) : (
+                  <SplashScreen />
+                )
+              }
+            />
 
-          {/* All five tech sections are built. */}
-          <Route path="/tech" element={<TechLayout />}>
-            <Route index element={<Navigate replace to="systemStatus" />} />
-            <Route path="systemStatus" element={<SystemStatusPage />} />
-            <Route path="displays" element={<DisplaysPage />} />
-            <Route path="routing" element={<RoutingPage />} />
-            <Route path="volume" element={<VolumePage />} />
-            <Route path="about" element={<AboutPage />} />
-          </Route>
+            {/* All five tech sections are built. */}
+            <Route path="/tech" element={<TechLayout />}>
+              <Route index element={<Navigate replace to="systemStatus" />} />
+              <Route path="systemStatus" element={<SystemStatusPage />} />
+              <Route path="displays" element={<DisplaysPage />} />
+              <Route path="routing" element={<RoutingPage />} />
+              <Route path="volume" element={<VolumePage />} />
+              <Route path="about" element={<AboutPage />} />
+            </Route>
 
-          <Route path="*" element={<Navigate replace to="/" />} />
-        </Routes>
+            <Route path="*" element={<Navigate replace to="/" />} />
+          </Routes>
 
-        <HeaderModalOutlet />
-        <ShutdownPrompt />
-      </div>
+          <HeaderModalOutlet />
+          <ShutdownPrompt />
+          <TourOverlay />
+        </div>
+      </TourProvider>
     </HeaderModalProvider>
   );
 };
