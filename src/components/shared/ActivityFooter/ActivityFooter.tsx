@@ -2,6 +2,7 @@ import { IconButton, useIShutdownPromptTimer, useRoomKey } from '@pepperdash/mob
 import type { IconProps } from '@pepperdash/mobile-control-react-app-core';
 import classicSharingIconUrl from '../../../assets/icons/activity-sharing.svg';
 import classicEndSessionIconUrl from '../../../assets/icons/activity-end-session.svg';
+import { useTour } from '../../../hooks/useTour';
 import { isMidnight } from '../../../theme/theme';
 import classes from './ActivityFooter.module.scss';
 
@@ -63,13 +64,23 @@ const EndSessionIcon = ({ className }: IconProps) =>
  * "End Session" starts the room's shutdown *prompt* countdown (`StartShutdown(Manual)`), not an
  * immediate shutdown - `DemoRoom` finishes the shutdown itself when that timer elapses.
  * `ShutdownPrompt` shows the confirmation and countdown while it runs.
+ *
+ * On the left, "Take the tour" starts the guided tour. It's hidden once someone has started a tour,
+ * until the room shuts down or the panel sits idle (see TourProvider); the Help modal always has it.
  */
 export const ActivityFooter = () => {
   const roomKey = useRoomKey();
   const shutdown = useIShutdownPromptTimer(roomKey);
+  const tour = useTour();
 
   return (
     <div className={classes.footer}>
+      {!tour.taken && (
+        <button type="button" className={classes.tourButton} onClick={tour.start}>
+          Take the tour
+        </button>
+      )}
+
       <IconButton
         multiIcon={SharingIcon}
         vert

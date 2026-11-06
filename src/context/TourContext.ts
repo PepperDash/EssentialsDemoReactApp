@@ -12,10 +12,17 @@ export interface TourContextValue {
   poweringOn: boolean;
   /** Whether RoomHome should show Advanced sharing for this step; undefined when no tour is running. */
   advanced?: boolean;
+  /**
+   * Someone has started the tour since the room last shut down or the panel last sat idle; the
+   * footer only offers it until then.
+   */
+  taken: boolean;
   start: () => void;
   next: () => void;
   back: () => void;
   end: () => void;
+  /** Offers the tour in the footer again. */
+  resetTaken: () => void;
 }
 
 export const TourContext = createContext<TourContextValue | undefined>(undefined);

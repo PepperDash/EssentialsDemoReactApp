@@ -1,9 +1,11 @@
-// Which UI theme this panel uses comes from the panel's own config ("theme": "midnight" on its
-// mcxpanel/mctsw device); anything else keeps the original UI. The config only arrives after the
+// Which UI theme this panel uses comes from the panel's own config ("theme" on its mcxpanel/mctsw
+// device): "classic" picks the original UI, and anything else - including Essentials' own default,
+// "light", and no config at all - picks Midnight. The config only arrives after the
 // websocket connects, but parts of Midnight are chosen once at page load (icon sets, the sources
 // band, lighting behavior). So the last theme the config asked for is remembered and applied here,
 // before anything renders - and PanelThemeSync reloads once if the config asks for a different one.
-// A theme picked in the Settings modal overrides the config.
+// A theme picked in the Settings modal overrides the config, until the panel sits idle (see
+// resetThemeChoice).
 //
 // All preferences (the themes, light/dark mode and accent color below) are kept per panel, so panels
 // opened in the same browser don't share them, in localStorage or, where storage is blocked (a TSW),
@@ -16,6 +18,11 @@ export type ThemeName = 'classic' | 'midnight';
 export type ColorMode = 'dark' | 'light';
 
 const isThemeName = (value: string): value is ThemeName => value === 'classic' || value === 'midnight';
+
+/** What a panel shows when nothing - config, Settings or the dev override - picks a theme. */
+const DEFAULT_THEME: ThemeName = 'midnight';
+
+const configuredThemeFor = (configTheme: string): ThemeName => (configTheme === 'classic' ? 'classic' : 'midnight');
 const isColorMode = (value: string): value is ColorMode => value === 'dark' || value === 'light';
 const isHexColor = (value: string) => /^#[0-9a-f]{6}$/i.test(value);
 
@@ -44,6 +51,9 @@ const accentPref = (theme: ThemeName): PanelPref => ({
   isValid: isHexColor,
 });
 
+// Set once someone has started the guided tour, so the footer stops offering it - see TourProvider.
+const TOUR_TAKEN: PanelPref = { key: `pd-tour-taken:${panelId}`, param: 'pdTourTaken', isValid: (v) => v === '1' };
+
 const prefs = createPanelPrefs(
   {
     href: () => location.href,
@@ -52,19 +62,22 @@ const prefs = createPanelPrefs(
     replaceUrl: (url) => history.replaceState(history.state, '', url),
     navigate: (url) => location.replace(url),
   },
-  [CONFIGURED_THEME, CHOSEN_THEME, ...(['classic', 'midnight'] as const).flatMap((t) => [modePref(t), accentPref(t)])]
+  [CONFIGURED_THEME, CHOSEN_THEME, TOUR_TAKEN, ...(['classic', 'midnight'] as const).flatMap((t) => [modePref(t), accentPref(t)])]
 );
 
 /** Puts the token and carried preferences back in the URL after in-app navigation drops them. */
 export const keepPanelQuery = prefs.keepInUrl;
 
-const chosenTheme = prefs.read(CHOSEN_THEME);
+let chosenTheme = prefs.read(CHOSEN_THEME);
 
 // Local development override: VITE_FORCE_THEME in .env.local (gitignored) pins the theme and
 // ignores the panel's config, for previewing a theme without editing the processor's config.
 const forcedTheme: string | undefined = import.meta.env.DEV ? import.meta.env.VITE_FORCE_THEME : undefined;
 
-if ((chosenTheme ?? forcedTheme ?? prefs.read(CONFIGURED_THEME)) === 'midnight') {
+/** The theme the panel falls back to without a Settings choice. */
+const panelDefaultTheme = () => forcedTheme ?? prefs.read(CONFIGURED_THEME) ?? DEFAULT_THEME;
+
+if ((chosenTheme ?? panelDefaultTheme()) === 'midnight') {
   document.documentElement.dataset.theme = 'midnight';
 }
 
@@ -84,7 +97,7 @@ const saveAndReload = (pref: PanelPref, theme: ThemeName) => {
 
 /** Called with the panel's configured theme; reloads once if it doesn't match the page's. */
 export const applyConfiguredTheme = (configTheme: string) => {
-  const theme: ThemeName = configTheme === 'midnight' ? 'midnight' : 'classic';
+  const theme = configuredThemeFor(configTheme);
   if (chosenTheme !== null || forcedTheme !== undefined || theme === pageTheme) return;
   saveAndReload(CONFIGURED_THEME, theme);
 };
@@ -93,6 +106,24 @@ export const applyConfiguredTheme = (configTheme: string) => {
 export const chooseTheme = (theme: ThemeName) => {
   if (theme === pageTheme) return;
   saveAndReload(CHOSEN_THEME, theme);
+};
+
+/**
+ * Forgets the theme picked in Settings, so the next person finds the panel's own theme. Reloads if
+ * that's not the one showing. Called when the panel has sat idle - see IdleReset.
+ */
+export const resetThemeChoice = () => {
+  if (chosenTheme === null) return;
+  chosenTheme = null;
+  prefs.write(CHOSEN_THEME, null);
+  if (panelDefaultTheme() !== pageTheme) prefs.reload();
+};
+
+/** Whether someone has started the guided tour since the room last shut down or sat idle. */
+export const getTourTaken = () => prefs.read(TOUR_TAKEN) === '1';
+
+export const setTourTaken = (taken: boolean) => {
+  if (taken !== getTourTaken()) prefs.write(TOUR_TAKEN, taken ? '1' : null);
 };
 
 // Light/dark mode. Only colors change between the two (see styles.scss), so it's a data-mode
