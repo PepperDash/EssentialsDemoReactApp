@@ -4,12 +4,32 @@ $active-color: var(--pd-accent); // colors/semantic/button-active
 $text-color: var(--pd-text);
 
 .footer {
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   width: 100%;
   padding: 5px 10px;
   background-color: var(--pd-bar);
+}
+
+// Pinned to the left edge, out of the flow, so the activity buttons stay centered whether or not
+// it shows. Matches the Help modal's Take the tour button.
+.tourButton {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  min-height: 44px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--pd-neutral);
+  color: var(--pd-text-inverse);
+  font-weight: var(--pd-weight-light);
+  font-size: 18px;
+  line-height: 22px;
+  cursor: pointer;
 }
 
 .button {
@@ -126,3 +146,15 @@ $text-color: var(--pd-text);
   }
 }
 
+
+.tourButton {
+  @include midnight {
+    @include glass;
+    @include caps-label;
+    left: 24px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 13px;
+    line-height: 18px;
+  }
+}

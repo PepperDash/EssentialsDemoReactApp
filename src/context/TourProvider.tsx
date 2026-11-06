@@ -3,6 +3,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 're
 import { findStep, isStepAvailable, TOUR_STEPS, tourTarget } from '../components/shared/Tour/tourSteps';
 import { useHeaderModal } from '../hooks/useHeaderModal';
 import { useShutdownPromptActive } from '../hooks/useShutdownPromptActive';
+import { getTourTaken, setTourTaken } from '../theme/theme';
 import { TourContext } from './TourContext';
 
 /** How long the room-off step waits for the room to come on before letting the user try again. */
@@ -11,7 +12,10 @@ const POWER_ON_TIMEOUT_MS = 15000;
 const hasTarget = (id: string) => document.querySelector(tourTarget(id)) !== null;
 
 /**
- * Runs the guided tour of the user screens (see `TOUR_STEPS`), started from the Help modal.
+ * Runs the guided tour of the user screens (see `TOUR_STEPS`), started from the Help modal or the
+ * footer. It also tracks whether a tour has been started, which hides the footer's button until the
+ * room shuts down or the panel sits idle (see IdleReset). That's kept with the panel's preferences,
+ * so a theme change's reload doesn't bring the button back.
  *
  * Each step sets up the screen it describes: it opens or closes the header modals and tells
  * RoomHome whether to show Advanced sharing. Nothing else changes, and nothing is sent to the
@@ -28,6 +32,7 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
   const { openModal, closeModal } = useHeaderModal();
   const [index, setIndex] = useState<number | null>(null);
   const [poweringOn, setPoweringOn] = useState(false);
+  const [taken, setTaken] = useState(getTourTaken);
 
   // HeaderModalProvider makes new functions whenever the open modal changes; read the latest
   // through a ref so the step effect below only runs when the step changes.
@@ -47,7 +52,14 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
     setPoweringOn(false);
   }, []);
 
+  const resetTaken = useCallback(() => {
+    setTaken(false);
+    setTourTaken(false);
+  }, []);
+
   const start = useCallback(() => {
+    setTaken(true);
+    setTourTaken(true);
     setPoweringOn(false);
     setIndex(find(0, 1) ?? null);
   }, [find]);
@@ -95,6 +107,11 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
     setIndex(isOn ? (find(index + 1, 1) ?? null) : null);
   }, [index, isOn, find]);
 
+  // The next person to turn the room on is offered the tour again.
+  useEffect(() => {
+    if (!isOn) resetTaken();
+  }, [isOn, resetTaken]);
+
   useEffect(() => {
     if (shutdownActive) end();
   }, [shutdownActive, end]);
@@ -117,10 +134,24 @@ export const TourProvider = ({ children }: { children: ReactNode }) => {
   const advanced = step ? (step.advanced ?? false) : undefined;
 
   const value = useMemo(
-    () => ({ step, position, hasBack, isLast, poweringOn, advanced, start, next, back, end }),
+    () => ({ step, position, hasBack, isLast, poweringOn, advanced, taken, start, next, back, end, resetTaken }),
     // position is rebuilt each render; its numbers are what matter.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [step, position?.number, position?.count, hasBack, isLast, poweringOn, advanced, start, next, back, end]
+    [
+      step,
+      position?.number,
+      position?.count,
+      hasBack,
+      isLast,
+      poweringOn,
+      advanced,
+      taken,
+      start,
+      next,
+      back,
+      end,
+      resetTaken,
+    ]
   );
 
   return <TourContext.Provider value={value}>{children}</TourContext.Provider>;

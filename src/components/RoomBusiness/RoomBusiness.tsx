@@ -13,6 +13,7 @@ import PageFade from './PageFade/PageFade';
 import { isMidnight } from '../../theme/theme';
 import HeaderModalOutlet from '../shared/HeaderModal/HeaderModalOutlet';
 import ShutdownPrompt from '../shared/ShutdownPrompt/ShutdownPrompt';
+import IdleReset from '../shared/IdleReset/IdleReset';
 import TourOverlay from '../shared/Tour/TourOverlay';
 import TechLayout from '../TechControls/TechLayout/TechLayout';
 import SystemStatusPage from '../TechControls/SystemStatus/SystemStatusPage';
@@ -99,6 +100,7 @@ const RoomBusiness = () => {
           <HeaderModalOutlet />
           <ShutdownPrompt />
           <TourOverlay />
+          <IdleReset />
         </div>
       </TourProvider>
     </HeaderModalProvider>

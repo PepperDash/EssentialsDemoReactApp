@@ -53,15 +53,19 @@ export const AdvancedSourceSelection = ({ tabsContainer }: AdvancedSourceSelecti
 
   return (
     <>
-      <div className={classes.destinationList} data-tour="destinations">
-        {destinations.map((destination) => (
-          <DestinationCard
-            key={destination.sinkKey}
-            label={destination.preferredName}
-            sinkKey={destination.sinkKey}
-            onSelect={handleSelectDestination}
-          />
-        ))}
+      <div className={classes.destinationList}>
+        {/* The tour highlights just the cards: the list stretches to fill the screen's middle, and
+            highlighting all of that would leave the tour's popup nowhere to go but on top of it. */}
+        <div className={classes.destinationRow} data-tour="destinations">
+          {destinations.map((destination) => (
+            <DestinationCard
+              key={destination.sinkKey}
+              label={destination.preferredName}
+              sinkKey={destination.sinkKey}
+              onSelect={handleSelectDestination}
+            />
+          ))}
+        </div>
       </div>
 
       <p className={classes.instruction}>Select a source below then a destination above</p>
