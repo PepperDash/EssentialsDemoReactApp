@@ -18,6 +18,17 @@ jobs:
       hash: ${{ needs.get_version.outputs.hash }}
       tag: ${{ needs.get_version.outputs.tag }}
       channel: ${{ needs.get_version.outputs.channel }}
+  # Generates pepperdash-metadata.json for each new release and registers it with Portal
+  metadata:
+    needs: [get_version, build_and_push]
+    if: needs.get_version.outputs.newVersion == 'true'
+    uses: PepperDash/workflow-templates/.github/workflows/pepperdash-metadata.yml@main
+    permissions:
+      contents: write   # attach pepperdash-metadata.json to the release
+      id-token: write   # GitHub OIDC token for UDM
+    with:
+      tag: ${{ needs.get_version.outputs.tag }}
+      kind: userInterface
   # deploy:
   #   uses: ./.github/workflows/deploy.yaml
   #   secrets: inherit
